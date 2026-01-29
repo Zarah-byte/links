@@ -7,7 +7,7 @@ Project linkk: https://typography-interaction-2526.github.io/project/4/
 
 ## Authors
 - [Zarah Yaqub](https://github.com/Zarah-byte)
-- [Katie Liu] (https://github.com/luk862-glitch)
+- [Katie Lu] (https://github.com/luk862-glitch)
 
 
 ## License
