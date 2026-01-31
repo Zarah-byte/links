@@ -33,5 +33,10 @@ h1 {
     font-size: var(--h1-copy);
 	color: var(--white);
     text-align: center;
+}
 
+
+
+footer {
+	text-align: center;
 }
