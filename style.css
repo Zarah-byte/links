@@ -5,12 +5,13 @@
 
 
 	/* ======FONTS====== */
-	--body-copy: 1rem;
-	--h1-copy: calc(var(--body-copy) * 5);
+	--body-copy: 1.25rem;
+	--small-copy: 1rem;
+	--h1-copy: calc(var(--body-copy) * 8);
 	--h2-copy: calc(var(--body-copy) * 1.5);
 	--h3-copy: calc(var(--body-copy) *1);
-	--font-body: "DM Sans", "helvetica", "san-serif";
-	--font-heading: "Monsieur La Doulaise";
+	--font-body: "Syne", "helvetica", "san-serif";
+	--font-heading: "Astloch";
 
 
 	/* ======SPACING====== */
@@ -28,15 +29,48 @@ body {
 }
 
 h1 {
-    padding-top: 5rem;
+    padding-top: 2rem;
     font-family: var(--font-heading);
     font-size: var(--h1-copy);
 	color: var(--white);
     text-align: center;
+	font-weight: bolder;
+	text-transform: uppercase;
 }
 
+ul {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
 
+li {
+	height: 50vh;
+	width: 50vw;
+	border-radius: 2rem, var(--white);
+}
+}
 
+.about {
+	display: block;
+text-align: center;
+max-width: 70ch; 
+
+	h2 {
+		text-transform: uppercase;
+		font-weight: bolder;
+	}
+}
 footer {
+	font-size: var(--small-copy);
+	text-align: center;
+	
+	position:fixed;
+    bottom:0;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 	text-align: center;
 }
+
+
