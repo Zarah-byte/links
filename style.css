@@ -1,4 +1,5 @@
 :root {
+	/* ======COLORS====== */
 	--color: #B1E4F9;
 	--black: #0d0d0e;
 	--white: #F0EFEC;
@@ -11,13 +12,13 @@
 	--h2-copy: calc(var(--body-copy) * 1.5);
 	--h3-copy: calc(var(--body-copy) *1);
 	--font-body: "Syne", "helvetica", "san-serif";
-	--font-heading: "Astloch";
+	--font-heading: "Asar";
 
 
 	/* ======SPACING====== */
 	--gutter: calc(var(--body-copy) * 1.5);
 
-
+	/* ======SCROLL BEHAVIOUR====== */
 	scroll-behavior: smooth;
 }
 
@@ -29,48 +30,119 @@ body {
 }
 
 h1 {
-    padding-top: 2rem;
-    font-family: var(--font-heading);
-    font-size: var(--h1-copy);
-	color: var(--white);
-    text-align: center;
+	padding-top: 2rem;
+	font-family: var(--font-heading);
+	font-size: var(--h1-copy);
+	font-kerning: normal;
+
+	text-align: center;
 	font-weight: bolder;
 	text-transform: uppercase;
+
+	color: var(--white);
 }
 
+/* MOBILE FIRST */
 ul {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 
-li {
-	height: 50vh;
-	width: 50vw;
-	border-radius: 2rem, var(--white);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;              /* space between cards */
 }
+
+ul > li {
+  flex: 0 0 100%;           /* 1 per row on mobile */
+  /* optional “card” styling: */
+  border: 2px solid var(--white);
+  border-radius: 1.25rem;
+  overflow: hidden;         /* helps image/video crop nicely */
+  min-height: 40vh;         /* optional */
+}
+
+/* If you want the link to fill the entire li (nice for “cards”) */
+ul > li > a {
+  display: block;
+  height: 100%;
 }
 
 .about {
 	display: block;
-text-align: center;
-max-width: 70ch; 
+	align-self: center;
+	text-align: center;
+	max-width: 70ch;
+
+	margin-bottom: 8rem;
 
 	h2 {
+		font-family: var(--font-heading);
+		font-size: var(--h2-copy);
 		text-transform: uppercase;
 		font-weight: bolder;
 	}
 }
+video {
+	block-size: 100%; /* Fill the parent. */
+	inline-size: 100%;
+	object-fit: cover; /* Cover the parent. */
+	object-position: right center; /* Side. */
+	overflow: clip;
+}
+
+img {
+	block-size: 100%; /* Fill the parent. */
+	inline-size: 100%;
+	object-fit: cover; /* Cover the parent. */
+	object-position: right center; /* Side. */
+	overflow: clip; /* Chrome needs this to hide extra. */
+/* WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING REMEMBERED OUT IMG LECTURE  */
+	/* SOURCED FROM https://typography-interaction-2526.github.io/topic/images/#object-fit-object-position */
+}
+
+
 footer {
 	font-size: var(--small-copy);
-	text-align: center;
-	
-	position:fixed;
-    bottom:0;
+
+
+	position: relative;
+	/* bottom: 1rem; */
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	margin-left: 1rem;
+	margin-right: 1rem;
 
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	text-align: center;
+	align-items: center;
+
+	/*  Googled "mdn center align"/*
+	/* found align-items: center; */
+	/* https://developer.mozilla.org/en-US/docs/Web/CSS/How_to/Layout_cookbook/Center_an_element  */
 }
 
 
+
+/* ======MEDIA QUERIES====== */
+/* TABLET: 2 per row */
+@media (min-width: 768px) {
+  ul > li {
+    flex-basis: calc(50% - (1.5rem / 2));
+  }
+
+
+  footer {
+		margin-left: 2rem;
+	margin-right: 2rem;
+  }
+}
+
+/* DESKTOP: 4 per row */
+@media (min-width: 1200px) {
+  ul > li {
+    flex-basis: calc(25% - (1.5rem * 3 / 4));
+  }
+}
