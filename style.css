@@ -1,7 +1,7 @@
 :root {
 	/* ======COLORS====== */
 	--color: #B1E4F9;
-	--black: #0d0d0e;
+	--black: #121212;
 	--white: #F0EFEC;
 
 
@@ -48,7 +48,8 @@ body {
 }
 
 h1 {
-	padding-top: 2rem;
+	margin-top: 8rem;
+	margin-bottom: 4rem;
 	font-family: var(--font-heading);
 	font-size: var(--h1-copy);
 	line-height: 1em;
@@ -191,8 +192,8 @@ found mdn link to "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Pr
 /* DESKTOP: 4 per row */
 @media (min-width: 1200px) {
 	body {
-font-size: 1.5rem;
-font-kerning: normal;
+		font-size: 1.5rem;
+		font-kerning: normal;
 	}
 
 	footer {
@@ -214,8 +215,8 @@ font-kerning: normal;
 	}
 
 	#navigation {
-padding-left: 2rem;
-padding-right: 2rem;
+		padding-left: 2rem;
+		padding-right: 2rem;
 	}
 }
 
