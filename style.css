@@ -17,23 +17,24 @@
 
 	/* ======SPACING====== */
 	--gutter: calc(var(--body-copy) * 1.5);
-	--padding-1:1rem;
-	--padding-2:2rem;
+	--padding-1: 1rem;
+	--padding-2: 2rem;
 
 	/* ======SCROLL BEHAVIOUR====== */
 	scroll-behavior: smooth;
 }
 
- #navigation {
+#navigation {
 	ul {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-padding-top: 2rem; ;
-	padding-left: 1rem;
-	padding-right: 1rem;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding-top: 2rem;
+		;
+		padding-left: 1rem;
+		padding-right: 1rem;
 	}
-} 
+}
 
 body {
 	font-family: var(--font-body);
@@ -60,29 +61,30 @@ h1 {
 }
 
 .blocks {
-ul {
-  list-style: none;
-  display: block;
+	ul {
+		list-style: none;
+		display: block;
 
-  
 
-  display: flex;
-  flex-wrap: wrap;
-  /* gap: 1.5rem;              space between cards */
-}
 
-ul li {
-  flex: 100%;
-  border: 2px solid var(--white);
-  /* border-radius: 1.25rem; */
-  overflow: hidden;         /* helps image/video crop nicely */
-  min-height: 50vh;
-}
+		display: flex;
+		flex-wrap: wrap;
+		/* gap: 1.5rem;              space between cards */
+	}
 
-ul li a {
-  display: block;
-  height: 100%;
-}
+	ul li {
+		flex: 100%;
+		border: 2px solid var(--white);
+		/* border-radius: 1.25rem; */
+		overflow: hidden;
+		/* helps image/video crop nicely */
+		min-height: 50vh;
+	}
+
+	ul li a {
+		display: block;
+		height: 100%;
+	}
 }
 
 
@@ -90,11 +92,11 @@ ul li a {
 	/* display: block; */
 	display: block;
 	margin: auto;
-	text-align:center;
+	text-align: center;
 	/* text-align: center; */
 	max-width: 50ch;
 
-	margin-top: 2rem;
+	margin-top: 5rem;
 	margin-bottom: 8rem;
 
 	padding-left: 1rem;
@@ -122,21 +124,27 @@ ul li a {
 /* ============== MEDIA ============== */
 video {
 	width: 100%;
-  height: 100%;
-  object-fit: cover;
-  overflow: clip;
+	height: 100%;
+	object-fit: cover;
+	overflow: clip;
 }
+
 /* 😭😭😭😭😭😭 How do i make to so that the video fills the container and clips  */
 
 img {
-	block-size: 100%; /* Fill the parent. */
+	block-size: 100%;
+	/* Fill the parent. */
 	inline-size: 100%;
-	object-fit: cover; /* Cover the parent. */
-	object-position: center; /* Side. */
-	overflow: clip; /* Chrome needs this to hide extra. */
-/* WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING REMEMBERED IMG LECTURE FROM TYPE & INTERACTION 1 */
+	object-fit: cover;
+	/* Cover the parent. */
+	object-position: center;
+	/* Side. */
+	overflow: clip;
+	/* Chrome needs this to hide extra. */
+	/* WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING REMEMBERED IMG LECTURE FROM TYPE & INTERACTION 1 */
 	/* SOURCED FROM https://typography-interaction-2526.github.io/topic/images/#object-fit-object-position */
 }
+
 /* =================================== */
 
 
@@ -147,7 +155,7 @@ footer {
 	position: relative;
 	/* bottom: 1rem; */
 	margin-top: 1rem;
-	margin-bottom: 1rem;
+	margin-bottom: 2rem;
 	margin-left: 1rem;
 	margin-right: 1rem;
 
@@ -168,26 +176,47 @@ footer {
 found mdn link to "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-basis" */
 /* the proerty stes the initial main size of content  */
 @media (min-width: 768px) {
-.blocks{ ul > li {
-    flex-basis: calc(50% - (1.5rem / 2));
-  }
-}
+	.blocks {
+		ul>li {
+			flex-basis: calc(50% - (1.5rem / 2));
+		}
+	}
 
-  footer {
-	margin-left: 2rem;
-	margin-right: 2rem;
-  }
+	footer {
+		margin-left: 2rem;
+		margin-right: 2rem;
+	}
 }
 
 /* DESKTOP: 4 per row */
 @media (min-width: 1200px) {
+	body {
+font-size: 1.5rem;
+font-kerning: normal;
+	}
+
+	footer {
+		font-size: 1.5rem;
+	}
+
+	.about h2 {
+		font-size: 5rem;
+	}
 
 	h1 {
 		font-size: 19rem;
 	}
-  .blocks {
-	ul > li {
-    flex-basis: calc(25% - (1.5rem * 3 / 4));
-  }
+
+	.blocks {
+		ul>li {
+			flex-basis: calc(25% - (1.5rem * 3 / 4));
+		}
+	}
+
+	#navigation {
+padding-left: 2rem;
+padding-right: 2rem;
+	}
 }
-}
+
+/* ISSUE WITH RESPOSIVENESS - AT APPROX 1257 THE H1 GETS STACKED WHY? */
