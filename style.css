@@ -8,78 +8,113 @@
 	/* ======FONTS====== */
 	--body-copy: 1.25rem;
 	--small-copy: 1rem;
-	--h1-copy: calc(var(--body-copy) * 8);
+	--h1-copy: calc(var(--body-copy) * 9);
 	--h2-copy: calc(var(--body-copy) * 1.5);
 	--h3-copy: calc(var(--body-copy) *1);
 	--font-body: "Syne", "helvetica", "san-serif";
-	--font-heading: "Asar";
+	--font-heading: "Bokor";
 
 
 	/* ======SPACING====== */
 	--gutter: calc(var(--body-copy) * 1.5);
+	--padding-1:1rem;
+	--padding-2:2rem;
 
 	/* ======SCROLL BEHAVIOUR====== */
 	scroll-behavior: smooth;
 }
 
+ #navigation {
+	ul {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+padding-top: 2rem; ;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	}
+} 
+
 body {
 	font-family: var(--font-body);
 	color: var(--white);
-	background-color: var(--black);
 	font-size: var(--body-copy);
+
+	background-color: var(--black);
+
+	/* margin-left: 2rem;
+	padding-right: 2rem; */
 }
 
 h1 {
 	padding-top: 2rem;
 	font-family: var(--font-heading);
 	font-size: var(--h1-copy);
-	font-kerning: normal;
+	line-height: 1em;
 
 	text-align: center;
-	font-weight: bolder;
+	/* font-weight: bolder; */
 	text-transform: uppercase;
 
 	color: var(--white);
 }
 
+.blocks {
 ul {
   list-style: none;
-  /* padding: 0;
-  margin: 0; */
+  display: block;
+
+  
 
   display: flex;
   flex-wrap: wrap;
   /* gap: 1.5rem;              space between cards */
 }
 
-ul > li {
-  flex: 0 0 100%;           /* 1 per row on mobile */
-  /* optional “card” styling: */
+ul li {
+  flex: 100%;
   border: 2px solid var(--white);
   /* border-radius: 1.25rem; */
   overflow: hidden;         /* helps image/video crop nicely */
-  min-height: 40vh;         /* optional */
+  min-height: 50vh;
 }
 
-/* If you want the link to fill the entire li (nice for “cards”) */
-ul > li > a {
+ul li a {
   display: block;
   height: 100%;
 }
+}
+
 
 .about {
+	/* display: block; */
 	display: block;
-	align-self: center;
-	text-align: center;
-	max-width: 70ch;
+	margin: auto;
+	text-align:center;
+	/* text-align: center; */
+	max-width: 50ch;
 
+	margin-top: 2rem;
 	margin-bottom: 8rem;
+
+	padding-left: 1rem;
+	padding-right: 1rem;
 
 	h2 {
 		font-family: var(--font-heading);
 		font-size: var(--h2-copy);
 		text-transform: uppercase;
 		font-weight: bolder;
+	}
+
+	a {
+		text-decoration: underline;
+		text-underline-offset: .25rem;
+	}
+
+	a:hover {
+		text-decoration: underline;
+		height: 100%;
 	}
 }
 
@@ -104,6 +139,7 @@ img {
 }
 /* =================================== */
 
+
 footer {
 	font-size: var(--small-copy);
 
@@ -118,7 +154,7 @@ footer {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	text-align: center;
+	/* text-align: center; */
 	align-items: center;
 
 	/*  Googled "mdn center align"/*
@@ -128,21 +164,30 @@ footer {
 
 /* ======MEDIA QUERIES====== */
 /* TABLET: 2 per row */
+/* Googled "us theere a way to set width of flex" 
+found mdn link to "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-basis" */
+/* the proerty stes the initial main size of content  */
 @media (min-width: 768px) {
-  ul > li {
+.blocks{ ul > li {
     flex-basis: calc(50% - (1.5rem / 2));
   }
-
+}
 
   footer {
-		margin-left: 2rem;
+	margin-left: 2rem;
 	margin-right: 2rem;
   }
 }
 
 /* DESKTOP: 4 per row */
 @media (min-width: 1200px) {
-  ul > li {
+
+	h1 {
+		font-size: 19rem;
+	}
+  .blocks {
+	ul > li {
     flex-basis: calc(25% - (1.5rem * 3 / 4));
   }
+}
 }

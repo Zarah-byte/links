@@ -5,60 +5,96 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- META TAG https://typography-interaction-2526.github.io/topic/responsive/#viewport-meta-tag -->
-	<style>
-		@import 'reset.css' layer(reset);
-		@import 'style.css' layer(common);
-	</style>
+	<link rel="stylesheet" href="reset.css">
+	<link rel="stylesheet" href="style.css">
+	<script defer src="script.js"></script>
 	<!-- ==============FONTS ============== -->
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Asar&family=Astloch:wght@400;700&family=Syne:wght@400..800&display=swap');
-		</style>
-		
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Bokor&family=Syne:wght@400..800&display=swap" rel="stylesheet">
 
 	<title>Links</title>
 </head>
-
 <body>
-    <hgroup>
-        <h1>Glassware</h1>
-    </hgroup>
-	
-	<section class="about">
-		<h2>About</h2>
-		<p>This collection brings together an exploration of glassware, spanning historical context, techniques, and visual inspiration. It layers imagery, videos, and links to highlight the versatility, beauty, and technical ingenuity of glass.</p>
-	</section>
-
-	<!--================== Blocks ================== -->
-	<section>
+	<nav id="navigation">
 		<ul>
-			<li><img src="Blocks/24_glassware-photography-by-coppi-barbieri.png" alt="Italian Trulli"></li>
-			<li><img src="Blocks/45_ornate-champagne-glass.jpg" alt="Italian Trulli"></li>
-			<li><img src="Blocks/44_glass-bong.png" alt=""></li>
-			<li><img src="Blocks/43_e512fff22894a5cd8964c43768c5428d-jpg.jpg" alt=""></li>
-			<li><img src="Blocks/42_mishima-jpg.jpg" alt=""></li>
-			<li> <video autoplay muted loop playsinline>
-				<source src="Blocks/40_untitled.mp4" type="video/mp4">
-			  </video></li>
-			  <!-- Googled "auto play video html css" -->
-			   <!-- it showed me a W3 link: https://www.w3schools.com/html/html5_video.asp -->
-				<!-- it showed me there are "control" attributes that you can add to influence width, height as well as muted and autoplay -->
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
+			<li>
+				Look
+			</li>
+			<li>
+				Watch
+			</li>
+			<li>
+				Read
+			</li>
+			<li>
+				Listen
+			</li>
 		</ul>
-	</section>
-</body>
+	</nav>
 
-<footer>
-    <p>Curated by Katie Lu & Zarah Yaqub</p>
-	<p>Coded & Designed by Zarah Yaqub</p>
-</footer>
+	<header>
+		<!-- <h1>Glassware</h1> -->
+		 <h1>About Glass</h1>
+	</header>
+	<main>
+
+		<!--================== Blocks ================== -->
+		<!-- I looked up hannah farnham and devansh khajanchi's projects and inspected them and found these list classifications thought it would help organise the media better in my project as well -->
+
+		<!-- Classes:
+	img-block
+	video-block
+	pdf-block
+	link-block -->
+
+		<section class="blocks">
+			<ul>
+
+				<li class="img-block"><data value="img">
+					<img src="Blocks/24_glassware-photography-by-coppi-barbieri.png"
+							alt="Italian Trulli">
+				</data></li>
+				<li class="img-block"><img src="Blocks/45_ornate-champagne-glass.jpg" alt="Italian Trulli"></li>
+				<li class="img-block"><img src="Blocks/44_glass-bong.png" alt=""></li>
+				<li class="img-block"><img src="Blocks/43_e512fff22894a5cd8964c43768c5428d-jpg.jpg" alt=""></li>
+				<li class="img-block"><img src="Blocks/42_mishima-jpg.jpg" alt=""></li>
+				<li class="video-block"> 
+					<video autoplay muted loop playsinline>
+					<source src="Blocks/40_untitled.mp4" type="video/mp4">
+					</video>
+				</li>
+				<!-- Googled "auto play video html css" -->
+				<!-- it showed me a W3 link: https://www.w3schools.com/html/html5_video.asp -->
+				<!-- it showed me there are "control" attributes that you can add to influence width, height as well as muted and autoplay -->
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul>
+		</section>
+
+		<section class="about">
+			<h2>About this collection</h2>
+			<p>This collection brings together an exploration of glassware, spanning historical context, techniques, and
+				visual inspiration. It layers imagery, videos, and links to highlight the versatility, beauty, and
+				technical ingenuity of glass.</p>
+
+				Cureate and created in colaboration with Katie Lu on <a href="https://www.are.na/katie-lu/glassware-rxfrlfenjcu">Are.na</a>
+		</section>
+	</main>
+
+
+	<footer>
+		<p>Curated by Katie&nbsp;Lu</p>
+		<p>Coded & Designed by Zarah&nbsp;Yaqub</p>
+	</footer>
+</body>
 
 </html>
