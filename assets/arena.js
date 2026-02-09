@@ -2,7 +2,6 @@ let channelSlug = 'glassware-rxfrlfenjcu' // The “slug” is just the end of t
 let myUsername = 'zarah-yaqub' // For linking to your profile.
 
 
-
 // First, let’s lay out some *functions*, starting with our basic metadata:
 let placeChannelInfo = (channelData) => {
 	// Target some elements in your HTML:
@@ -11,14 +10,14 @@ let placeChannelInfo = (channelData) => {
 	let channelCount = document.querySelector('#channel-count')
 	let channelLink = document.querySelector('#channel-link')
 
-	console.log(channelData)
-
 	// Then set their content/attributes to our data:
 	channelTitle.innerHTML = channelData.title
 	channelDescription.innerHTML = channelData.description.html
 	channelCount.innerHTML = channelData.counts.blocks
 	channelLink.href = `https://www.are.na/channel/${channelSlug}`
 }
+
+
 
 // Then our big function for specific-block-type rendering:
 let renderBlock = (blockData) => {
@@ -39,8 +38,18 @@ let renderBlock = (blockData) => {
 						<img alt="${blockData.image.alt_text}" src="${ blockData.image.large.src_2x }">
 					</picture>
 					<figcaption>
-						<h3>${ blockData.title }</h3>
-						${ blockData.description.html }
+						<h3>
+							${ blockData.title
+								? blockData.title // If `blockData.title` exists, do this.
+								: `Untitled` // Otherwise do this.
+
+								// This is a “ternary operator”: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator
+							}
+						</h3>
+						${ blockData.description // Here, checks for the object; could also write `blockData.description?.html`.
+							? `<div>${blockData.description.html}</div>` // Wrap/interpolate the HTML.
+							: `` // Our “otherwise” can also be blank!
+						}
 					</figcaption>
 				</figure>
 				<p><a href="${ blockData.source.url }">See the original ↗</a></p>
@@ -157,10 +166,25 @@ let renderUser = (userData) => {
 
 
 // Finally, a helper function to fetch data from the API, then run a callback function with it:
-let fetchJson = (url, callback) => {
+let fetchJson = (url, callback, pageResponses = []) => {
 	fetch(url, { cache: 'no-store' })
 		.then((response) => response.json())
-		.then((json) => callback(json))
+		.then((json) => {
+			// Add this page to our temporary “accumulator” list parameter (an array).
+			pageResponses.push(json)
+
+			// Are.na response includes this “there are more!” flag (a boolean):
+			if (json.meta && json.meta.has_more_pages) { // If that exists and is `true`, keep going…
+				// Fetch *another* page worth, passing along our previous/accumulated responses.
+				fetchJson(`${url}&page=${pageResponses.length + 1}`, callback, pageResponses)
+			} else { // If it is `false`, there are no more pages…
+				// “Flattens” them all together as if they were one page response.
+				json.data = pageResponses.flatMap((page) => page.data)
+
+				// Return the data to the callback!
+				callback(json)
+			}
+	})
 }
 
 // More on `fetch`:
