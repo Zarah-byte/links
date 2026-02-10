@@ -137,15 +137,12 @@ let renderBlock = (blockData) => {
 			// More on `iframe`:
 			// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
 		}
-
 		// Linked audio!
 		else if (embedType.includes('rich')) {
 			// …up to you!
 		}
 	}
 }
-
-
 
 // A function to display the owner/collaborator info:
 let renderUser = (userData) => {
