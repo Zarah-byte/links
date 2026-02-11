@@ -116,8 +116,16 @@ let renderBlock = (blockData) => {
 		}
 
 		// Uploaded PDFs!
-		else if (contentType.includes('pdf')) {
-			// …up to you!
+		else if (blockData.type == 'Attachment' &&
+			blockData.attachment.content_type.includes('pdf')) {
+   
+	   let pdfItem = `
+	   <li class="pdf-block">
+		   <iframe src="${blockData.attachment.url}" width="100%" height="500px"></iframe>
+	   </li>
+	   `
+   
+	   channelBlocks.insertAdjacentHTML('beforeend', pdfItem)
 		}
 
 		// Uploaded audio!
