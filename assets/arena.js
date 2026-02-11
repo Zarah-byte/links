@@ -46,10 +46,7 @@ let renderBlock = (blockData) => {
 								// This is a “ternary operator”: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator
 							}
 						</h3>
-						${ blockData.description // Here, checks for the object; could also write `blockData.description?.html`.
-							? `<div>${blockData.description.html}</div>` // Wrap/interpolate the HTML.
-							: `` // Our “otherwise” can also be blank!
-						}
+						
 					</figcaption>
 				</figure>
 				<p><a href="${ blockData.source.url }">See the original ↗</a></p>
@@ -71,7 +68,6 @@ let renderBlock = (blockData) => {
 		// <p><em>Image</em></p>
 			`
 			<li>
-				
 				<div>
 				<img src="${blockData.image.src}">
 				</div>
@@ -85,7 +81,17 @@ let renderBlock = (blockData) => {
 
 	// Text!
 	else if (blockData.type == 'Text') {
-		// …up to you!
+		let textItem = 
+		`
+		<li class="text-block">
+			<p><em>Text</em></p>
+			<div class="text-content">
+				${blockData.content_html}
+			</div>
+		</li>
+		`
+	
+		channelBlocks.insertAdjacentHTML('beforeend', textItem)
 	}
 
 	// Uploaded (not linked) media…
