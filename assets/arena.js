@@ -27,10 +27,10 @@ let renderBlock = (blockData) => {
 	// Links!
 	if (blockData.type == 'Link') {
 		// Declares a “template literal” of the dynamic HTML we want.
+		// <p><em>Link</em></p>
 		let linkItem =
 			`
 			<li>
-				<p><em>Link</em></p>
 				<figure>
 					<picture>
 						<source media="(width < 500px)" srcset="${ blockData.image.small.src_2x }">
@@ -65,6 +65,21 @@ let renderBlock = (blockData) => {
 
 	// Images!
 	else if (blockData.type == 'Image') {
+		// Declares a “template literal” of the dynamic HTML we want.
+		console.log(blockData)
+		let imageItem =
+		// <p><em>Image</em></p>
+			`
+			<li>
+				
+				<div>
+				<img src="${blockData.image.src}">
+				</div>
+			</li>
+			`
+
+		// And puts it into the page!
+		channelBlocks.insertAdjacentHTML('beforeend', imageItem)
 		// …up to you!
 	}
 
@@ -151,9 +166,7 @@ let renderUser = (userData) => {
 	let userAddress =
 		`
 		<address>
-			<img src="${ userData.avatar }">
-			<h3>${ userData.name }</h3>
-			<p><a href="https://are.na/${ userData.slug }">Are.na profile ↗</a></p>
+			<p><a href="https://are.na/${ userData.slug }">Zarah Yaqub</a></p>
 		</address>
 		`
 
