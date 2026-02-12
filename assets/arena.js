@@ -146,7 +146,6 @@ let renderBlock = (blockData) => {
 				`
 
 			channelBlocks.insertAdjacentHTML('beforeend', linkedVideoItem)
-
 			// More on `iframe`:
 			// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
 		}
