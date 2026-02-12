@@ -18,7 +18,6 @@ let placeChannelInfo = (channelData) => {
 }
 
 
-
 // Then our big function for specific-block-type rendering:
 let renderBlock = (blockData) => {
 	// To start, a shared `ul` where we’ll insert all our blocks
@@ -37,19 +36,7 @@ let renderBlock = (blockData) => {
 						<source media="(width < 1000px)" srcset="${ blockData.image.medium.src_2x }">
 						<img alt="${blockData.image.alt_text}" src="${ blockData.image.large.src_2x }">
 					</picture>
-					<figcaption>
-						<h3>
-							${ blockData.title
-								? blockData.title // If `blockData.title` exists, do this.
-								: `Untitled` // Otherwise do this.
-
-								// This is a “ternary operator”: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator
-							}
-						</h3>
-						
-					</figcaption>
 				</figure>
-				<p><a href="${ blockData.source.url }">See the original ↗</a></p>
 			</li>
 			`
 
@@ -104,7 +91,6 @@ let renderBlock = (blockData) => {
 			let videoItem =
 				`
 				<li>
-					<p><em>Video</em></p>
 					<video controls src="${ blockData.attachment.url }"></video>
 				</li>
 				`
@@ -134,7 +120,6 @@ let renderBlock = (blockData) => {
 			let audioItem =
 				`
 				<li>
-					<p><em>Audio</em></p>
 					<audio controls src="${ blockData.attachment.url }"></video>
 				</li>
 				`
@@ -156,7 +141,6 @@ let renderBlock = (blockData) => {
 			let linkedVideoItem =
 				`
 				<li>
-					<p><em>Linked Video</em></p>
 					${ blockData.embed.html }
 				</li>
 				`
