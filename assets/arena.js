@@ -54,11 +54,8 @@ let renderBlock = (blockData) => {
 		let imageItem =
 		// <p><em>Image</em></p>
 			`
-			<li>
-				<div>
-				<img src="${blockData.image.src}">
-				</div>
-			</li>
+			<li class="img-block">
+			<img src="${blockData.image.src}" alt="">
 			`
 
 		// And puts it into the page!
@@ -70,12 +67,12 @@ let renderBlock = (blockData) => {
 	else if (blockData.type == 'Text') {
 		let textItem = 
 		`
-		<li class="text-block">
-			<p><em>Text</em></p>
-			<div class="text-content">
-				${blockData.content_html}
-			</div>
-		</li>
+			<li class="text-block">
+				<p><em>Text</em></p>
+				<div class="text-content">
+					${blockData.content_html}
+				</div>
+			</li>
 		`
 	
 		channelBlocks.insertAdjacentHTML('beforeend', textItem)
@@ -119,9 +116,11 @@ let renderBlock = (blockData) => {
 			// …still up to you, but here’s an `audio` element:
 			let audioItem =
 				`
-				<li>
-					<audio controls src="${ blockData.attachment.url }"></video>
-				</li>
+				<div class="cover-audio">
+					<li>
+						<audio controls src="${ blockData.attachment.url }"></video>
+					</li>
+				</div>
 				`
 
 			channelBlocks.insertAdjacentHTML('beforeend', audioItem)
@@ -140,9 +139,11 @@ let renderBlock = (blockData) => {
 			// …still up to you, but here’s an example `iframe` element:
 			let linkedVideoItem =
 				`
-				<li>
-					${ blockData.embed.html }
-				</li>
+				<div class="cover-video">
+					<li>
+						${ blockData.embed.html }
+					</li>
+				</div>
 				`
 
 			channelBlocks.insertAdjacentHTML('beforeend', linkedVideoItem)
@@ -194,6 +195,26 @@ let fetchJson = (url, callback, pageResponses = []) => {
 	})
 }
 
+// Similar to before, setting up variables.
+let modalButton = document.querySelector('#modal') // The thing we’re clicking.
+let modalDialog = document.querySelector('#dialog') // Now one for our `dialog`.
+let closeButton = modalDialog.querySelector('button') // Only looking within `modalDialog`.
+
+modalButton.addEventListener('click', () => { // “Listen” for clicks.
+	modalDialog.showModal() // This opens it up.
+})
+
+closeButton.addEventListener('click', () => {
+	modalDialog.close() // And this closes it!
+})
+
+// Listen to *all* clicks, now including the `event` parameter…
+document.addEventListener('click', (event) => {
+	// Only clicks on the page itself behind the `dialog`.
+	if (event.target == document.documentElement) {
+		modalDialog.close() // Close it too then.
+	}
+})
 // More on `fetch`:
 // https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch
 

@@ -8,7 +8,7 @@
 	/* ======FONTS====== */
 	--body-copy: 1.25rem;
 	--small-copy: 1rem;
-	--h1-copy: calc(var(--body-copy) * 9);
+	--h1-copy: 50rem;
 	--h2-copy: calc(var(--body-copy) * 1.5);
 	--h3-copy: calc(var(--body-copy) *1);
 	--font-body: "Syne", "helvetica", "san-serif";
@@ -24,24 +24,52 @@
 	scroll-behavior: smooth;
 }
 
+header {
+		display: flex;
+		align-items: center;
+		padding: 0 1rem;
+
+	border-bottom: .1rem solid var(--black);
+
+	
+	path{
+		fill: var(--black);
+		width: 2rem;
+		height: auto;
+	}
+}
+
+
 #navigation {
+	border-bottom: .1rem solid var(--black);
+	border-top: .1rem solid var(--black);
+	padding: 1rem;
+	margin-bottom: 2rem;
 	ul {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
-		padding-top: 2rem;
 		;
 		padding-left: 1rem;
 		padding-right: 1rem;
 	}
 }
 
+#navigation ::before {
+border-top: 1rem var(--black); 
+
+}
+
+#navigation ::after {
+border-bottom: 1rem, var(--black);
+}
+
 body {
 	font-family: var(--font-body);
-	color: var(--white);
-	font-size: var(--body-copy);
+	color: var(--black);
+	font-size: 1rem;
 
-	background-color: var(--black);
+	background-color: var(--white);
 
 	/* margin-left: 2rem;
 	padding-right: 2rem; */
@@ -52,19 +80,19 @@ body {
 	}
 }
 
-header {
+hgroup {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	width: 100%;
 	justify-content: space-between;
-	padding-bottom: 5rem;
-	
-		h1 {
+	padding-bottom: 2rem;
+
+	h1 {
 		margin-top: 8rem;
 		margin-bottom: 4rem;
 		font-family: var(--font-heading);
-		font-size: var(--h1-copy);
+		font-size: 5rem;
 		letter-spacing: .02em;
 		line-height: 1em;
 
@@ -72,74 +100,32 @@ header {
 		/* font-weight: bolder; */
 		text-transform: uppercase;
 
-		color: var(--white);
+		color: var(--black);
 	}
 }
 
 .blocks {
 	ul {
-		list-style: none;
-		display: block;
+		display: grid;
+		grid-template-columns: 1fr; /* mobile */
+		gap: 2rem;
+	}
 
+	li {
+		height: 80vh;
+		overflow: hidden;
+		/* margin-bottom: 4rem; */
 
-
-		display: flex;
-		flex-wrap: wrap;
-
-		li {
-			flex: 100%;
-			border-radius: 1rem;
-			overflow: hidden;
-			/* helps image/video crop nicely */
-			height: 50vh;
-
-			a {
-				display: block;
-				height: 100%;
-			}
+		a {
+			display: block;
+			height: 100%;
 		}
 	}
 }
 
-/* .container-test {
-			backdrop-filter: blur(10rem);
-	} */
 
-.img-block {
-	position: relative;
-	overflow: hidden;
-}
-
-.container-test {
-	position: absolute;
-	inset: 0;
-	z-index: 2;
-
-	/* glass look */
-	/* From https://css.glass */
-	background: rgba(255, 255, 255, 0.49);
-	/* border-radius: 16px; */
-	box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-	backdrop-filter: blur(5px);
-	-webkit-backdrop-filter: blur(14.5px);
-	border: 1px solid rgba(255, 255, 255, 0.21);
-
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	transition: opacity 0.3s ease;
-}
-
-/* hide on hover */
-.img-block:hover .container-test {
-	opacity: 0;
-	pointer-events: none;
-}
-
-
+  
 .description {
-	/* display: block; */
 	display: block;
 	margin: auto;
 	text-align: center;
@@ -192,60 +178,85 @@ img {
 /* WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING REMEMBERED IMG LECTURE FROM TYPE & INTERACTION 1 */
 /* SOURCED FROM https://typography-interaction-2526.github.io/topic/images/#object-fit-object-position */
 
-
+ul {
+	.cover-video {
+		color: red;
+	  }
+	
+	  .cover-audio {
+		color: blueviolet;
+	  }
+}
 /* =================================== */
 
 
 footer {
 	font-size: var(--small-copy);
 
-
 	position: relative;
-	/* bottom: 1rem; */
-	margin-top: 1rem;
-	margin-bottom: 2rem;
-	margin-left: 1rem;
-	margin-right: 1rem;
+	margin: 1rem 1rem 2rem;
 
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	/* text-align: center; */
 	align-items: center;
 
-	/*  Googled "mdn center align"/*
+	/* Googled "mdn center align" */
 	/* found align-items: center; */
 	/* https://developer.mozilla.org/en-US/docs/Web/CSS/How_to/Layout_cookbook/Center_an_element  */
-	}
+}
 
-	#channel-link {
-		display: inline-block;
-		
-		padding: 0.75rem 1rem;
-		margin-top: 2rem;
-		background: rgba(255, 255, 255, 0.3);
-		backdrop-filter: blur(10px);
-		color: var(--white);
-		border-radius: 1rem;
-		border: 1px solid rgba(255, 255, 255, 0.4);
-		text-decoration: none;
-		transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
-	}
-	#channel-link:hover {
-		background-color: var(--color);
-		color: var(--black);
-		transform: translateY(-2px);
-	}
+#dialog {
+	margin: 0;
+	padding: 2rem;
+  
+	width: min(720px, 90vw);
+	height: 100vh;
+  
+	position: fixed;
+	inset: 0 auto 0 0; /* top left bottom left */
+	
+	background: white;
+	border: none;
+	border-radius: 0;
+  
+	display: grid;
+	align-content: start;
+	gap: 1.5rem;
+  
+	/* START OFFSCREEN */
+	transform: translateX(-100%);
+	transition: transform 0.45s cubic-bezier(.77,0,.18,1);
+  }
+  
+  /* When open → slide in */
+  #dialog[open] {
+	transform: translateX(0);
+  }
+  
+  /* backdrop */
+  #dialog::backdrop {
+	background: rgba(0,0,0,0.5);
+	backdrop-filter: blur(6px);
+  }  
+
 
 /* ======MEDIA QUERIES====== */
 /* TABLET: 2 per row */
-/* Googled "us theere a way to set width of flex" 
-found mdn link to "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-basis" */
-/* the proerty stes the initial main size of content  */
 @media (width > 768px) {
+	body {
+		font-size: 1.5rem;
+	}
+
 	.blocks {
-		ul>li {
-			flex-basis: calc(50% - (1.5rem / 2));
+		ul {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	hgroup {
+		h1 {
+			font-size: 10rem;
 		}
 	}
 
@@ -255,28 +266,33 @@ found mdn link to "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Pr
 	}
 }
 
-/* DESKTOP: 4 per row */
+/* DESKTOP: 3 per row */
 @media (width > 1200px) {
 	body {
 		font-size: 1.5rem;
 		font-kerning: normal;
 	}
 
+	.blocks {
+		ul {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+
+		hgroup{
+			h1 {
+			font-size: 18rem;
+		}
+	}
+
 	footer {
 		font-size: 1.5rem;
 	}
 
-	.about h2 {
-		font-size: 5rem;
-	}
-
-	h1 {
-		font-size: 10rem;
-	}
-
-	.blocks {
-		ul>li {
-			flex-basis: calc(25% - (1.5rem * 3 / 4));
+	.about {
+		h2 {
+			font-size: 5rem;
 		}
 	}
 
