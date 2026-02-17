@@ -32,9 +32,9 @@ let renderBlock = (blockData) => {
 			<li>
 				<figure>
 					<picture>
-						<source media="(width < 500px)" srcset="${ blockData.image.small.src_2x }">
-						<source media="(width < 1000px)" srcset="${ blockData.image.medium.src_2x }">
-						<img alt="${blockData.image.alt_text}" src="${ blockData.image.large.src_2x }">
+						<source media="(width < 500px)" srcset="${blockData.image.small.src_2x}">
+						<source media="(width < 1000px)" srcset="${blockData.image.medium.src_2x}">
+						<img alt="${blockData.image.alt_text}" src="${blockData.image.large.src_2x}">
 					</picture>
 				</figure>
 			</li>
@@ -52,10 +52,12 @@ let renderBlock = (blockData) => {
 		// Declares a “template literal” of the dynamic HTML we want.
 		console.log(blockData)
 		let imageItem =
-		// <p><em>Image</em></p>
+			// <p><em>Image</em></p>
 			`
-			<li class="img-block">
-			<img src="${blockData.image.src}" alt="">
+			<button id="modal">
+				<li class="img-block">
+				<img src="${blockData.image.src}" alt="">
+			</button>
 			`
 
 		// And puts it into the page!
@@ -65,8 +67,8 @@ let renderBlock = (blockData) => {
 
 	// Text!
 	else if (blockData.type == 'Text') {
-		let textItem = 
-		`
+		let textItem =
+			`
 			<li class="text-block">
 				<p><em>Text</em></p>
 				<div class="text-content">
@@ -74,7 +76,7 @@ let renderBlock = (blockData) => {
 				</div>
 			</li>
 		`
-	
+
 		channelBlocks.insertAdjacentHTML('beforeend', textItem)
 	}
 
@@ -88,7 +90,7 @@ let renderBlock = (blockData) => {
 			let videoItem =
 				`
 				<li>
-					<video controls src="${ blockData.attachment.url }"></video>
+					<video controls src="${blockData.attachment.url}"></video>
 				</li>
 				`
 
@@ -101,14 +103,14 @@ let renderBlock = (blockData) => {
 		// Uploaded PDFs!
 		else if (blockData.type == 'Attachment' &&
 			blockData.attachment.content_type.includes('pdf')) {
-   
-	   let pdfItem = `
+
+			let pdfItem = `
 	   <li class="pdf-block">
 		   <iframe src="${blockData.attachment.url}" width="100%" height="500px"></iframe>
 	   </li>
 	   `
-   
-	   channelBlocks.insertAdjacentHTML('beforeend', pdfItem)
+
+			channelBlocks.insertAdjacentHTML('beforeend', pdfItem)
 		}
 
 		// Uploaded audio!
@@ -118,7 +120,7 @@ let renderBlock = (blockData) => {
 				`
 				<div class="cover-audio">
 					<li>
-						<audio controls src="${ blockData.attachment.url }"></video>
+						<audio controls src="${blockData.attachment.url}"></video>
 					</li>
 				</div>
 				`
@@ -141,7 +143,7 @@ let renderBlock = (blockData) => {
 				`
 				<div class="cover-video">
 					<li>
-						${ blockData.embed.html }
+						${blockData.embed.html}
 					</li>
 				</div>
 				`
@@ -164,7 +166,7 @@ let renderUser = (userData) => {
 	let userAddress =
 		`
 		<address>
-			<p><a href="https://are.na/${ userData.slug }">Zarah Yaqub</a></p>
+			<p><a href="https://are.na/${userData.slug}">Zarah Yaqub</a></p>
 		</address>
 		`
 
@@ -192,7 +194,7 @@ let fetchJson = (url, callback, pageResponses = []) => {
 				// Return the data to the callback!
 				callback(json)
 			}
-	})
+		})
 }
 
 // Similar to before, setting up variables.

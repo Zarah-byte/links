@@ -28,7 +28,7 @@ header {
 	padding: 1rem;
 	display: flex;
 	justify-content: space-between;
-  	/* align-items: center; */
+	/* align-items: center; */
 	border-bottom: .1rem solid var(--black);
 
 	#logo {
@@ -36,8 +36,8 @@ header {
 		width: auto;
 		height: 2rem;
 	}
-	
-	#channel-link{
+
+	#channel-link {
 		fill: var(--black);
 		width: auto;
 		height: 2rem;
@@ -50,6 +50,10 @@ header {
 	border-top: .1rem solid var(--black);
 	padding: 1rem;
 	margin-bottom: 2rem;
+
+	position: sticky;
+	top: 0;
+
 	ul {
 		display: flex;
 		flex-direction: row;
@@ -61,12 +65,12 @@ header {
 }
 
 #navigation ::before {
-border-top: 1rem var(--black); 
+	border-top: 1rem var(--black);
 
 }
 
 #navigation ::after {
-border-bottom: 1rem, var(--black);
+	border-bottom: 1rem, var(--black);
 }
 
 body {
@@ -74,16 +78,12 @@ body {
 	color: var(--black);
 	font-size: 1rem;
 
-	background-color: var(--white);
-
-	/* margin-left: 2rem;
-	padding-right: 2rem; */
-
 	a {
 		text-decoration: underline;
 		text-underline-offset: .25rem;
 	}
 }
+
 
 hgroup {
 	display: flex;
@@ -112,7 +112,8 @@ hgroup {
 .blocks {
 	ul {
 		display: grid;
-		grid-template-columns: 1fr; /* mobile */
+		grid-template-columns: 1fr;
+		/* mobile */
 		gap: 2rem;
 	}
 
@@ -120,6 +121,7 @@ hgroup {
 		height: 80vh;
 		overflow: hidden;
 		/* margin-bottom: 4rem; */
+		border-radius: 1rem;
 
 		a {
 			display: block;
@@ -176,6 +178,12 @@ img {
 	object-fit: cover;
 	object-position: center;
 	display: block;
+
+	filter: blur(4.2px) sepia(0%);
+}
+
+img:hover {
+	filter: blur(0px) sepia(0%);
 }
 
 /* WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING REMEMBERED IMG LECTURE FROM TYPE & INTERACTION 1 */
@@ -184,12 +192,13 @@ img {
 ul {
 	.cover-video {
 		color: red;
-	  }
-	
-	  .cover-audio {
+	}
+
+	.cover-audio {
 		color: blueviolet;
-	  }
+	}
 }
+
 /* =================================== */
 
 
@@ -210,38 +219,44 @@ footer {
 }
 
 #dialog {
-	margin: 0;
+	margin: auto;
 	padding: 2rem;
-  
+
 	width: min(720px, 90vw);
-	height: 100vh;
-  
+	height: 80vh;
+	overflow: hidden;
+
 	position: fixed;
-	inset: 0 auto 0 0; /* top left bottom left */
-	
+	inset: 0;
+	/* allows centering */
+
 	background: white;
 	border: none;
-	border-radius: 0;
-  
+	border-radius: 1rem;
+
 	display: grid;
 	align-content: start;
 	gap: 1.5rem;
-  
-	/* START OFFSCREEN */
-	transform: translateX(-100%);
-	transition: transform 0.45s cubic-bezier(.77,0,.18,1);
-  }
-  
-  /* When open → slide in */
-  #dialog[open] {
-	transform: translateX(0);
-  }
-  
-  /* backdrop */
-  #dialog::backdrop {
-	background: rgba(0,0,0,0.5);
+
+	/* subtle scale-in instead of slide */
+	transform: scale(.95);
+	opacity: 0;
+	transition:
+		transform 0.35s cubic-bezier(.77, 0, .18, 1),
+		opacity 0.35s ease;
+}
+
+/* When open */
+#dialog[open] {
+	transform: scale(1);
+	opacity: 1;
+}
+
+/* backdrop */
+#dialog::backdrop {
+	background: rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(6px);
-  }  
+}
 
 
 /* ======MEDIA QUERIES====== */
@@ -283,8 +298,8 @@ footer {
 	}
 
 
-		hgroup{
-			h1 {
+	hgroup {
+		h1 {
 			font-size: 18rem;
 		}
 	}
