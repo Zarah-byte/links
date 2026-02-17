@@ -52,7 +52,11 @@ header {
 	margin-bottom: 2rem;
 
 	position: sticky;
-	top: 0;
+		position: sticky;
+		top: 0;
+		z-index: 1000;           /* bring it above main */
+		background: var(--white); /* or whatever your page bg is */
+
 
 	ul {
 		display: flex;
@@ -75,6 +79,7 @@ header {
 
 body {
 	font-family: var(--font-body);
+	background-color: var(--white);
 	color: var(--black);
 	font-size: 1rem;
 
@@ -188,6 +193,10 @@ img:hover {
 
 /* WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING REMEMBERED IMG LECTURE FROM TYPE & INTERACTION 1 */
 /* SOURCED FROM https://typography-interaction-2526.github.io/topic/images/#object-fit-object-position */
+
+.image-container { 
+	--link-url: "/Users/zarahyaqub/Desktop/Parsons/Spring 2026/Type/SVG/Asset 3.svg";
+} 
 
 ul {
 	.cover-video {

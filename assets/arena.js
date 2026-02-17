@@ -17,9 +17,20 @@ let placeChannelInfo = (channelData) => {
 	channelLink.href = `https://www.are.na/channel/${channelSlug}`
 }
 
+// for each of the if/else if or else branches 
+// define another constant called: 
+// url = blockData.type src? || ""
+// <div class="image-container" 
+//    style = "--link-url: url('${getUrl(blockdata.type)')}>
+
 
 // Then our big function for specific-block-type rendering:
 let renderBlock = (blockData) => {
+	// function getUrl(type){
+	// 	if (type === "Link")  return "/Users/zarahyaqub/Desktop/Repos.nosync/links/Svgs/01.svg";
+	// 	if (type === "Image") return svgImage;
+	//   }
+	//   const getUrl = (type) => MASKS[type]
 	// To start, a shared `ul` where we’ll insert all our blocks
 	let channelBlocks = document.querySelector('#channel-blocks')
 
@@ -28,15 +39,35 @@ let renderBlock = (blockData) => {
 		// Declares a “template literal” of the dynamic HTML we want.
 		// <p><em>Link</em></p>
 		let linkItem =
-			`
+		`
 			<li>
-				<figure>
-					<picture>
-						<source media="(width < 500px)" srcset="${blockData.image.small.src_2x}">
-						<source media="(width < 1000px)" srcset="${blockData.image.medium.src_2x}">
-						<img alt="${blockData.image.alt_text}" src="${blockData.image.large.src_2x}">
-					</picture>
-				</figure>
+					<figure>
+						<picture>
+							<source media="(width < 500px)" srcset="${blockData.image.small.src_2x}">
+							<source media="(width < 1000px)" srcset="${blockData.image.medium.src_2x}">
+							<img alt="${blockData.image.alt_text}" src="${blockData.image.large.src_2x}">
+						</picture>
+					</figure>
+						<button id="modal">Click here!</button>
+		<dialog id="dialog">
+						<figcaption>
+							<h3>
+								${ blockData.title
+									? blockData.title // If `blockData.title` exists, do this.
+									: `Untitled` // Otherwise do this.
+									// This is a “ternary operator”: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator
+								}
+							</h3>
+							${ blockData.description // Here, checks for the object; could also write `blockData.description?.html`.
+								? `<div>${blockData.description.html}</div>` // Wrap/interpolate the HTML.
+								: `` // Our “otherwise” can also be blank!
+							}
+						</figcaption>
+										</figure>
+			<button>Close it!</button>
+		</dialog>
+				<p><a href="${ blockData.source.url }">See the original ↗</a></p>
+				
 			</li>
 			`
 
@@ -70,9 +101,8 @@ let renderBlock = (blockData) => {
 		let textItem =
 			`
 			<li class="text-block">
-				<p><em>Text</em></p>
 				<div class="text-content">
-					${blockData.content_html}
+					<p>${blockData.content.plain}</p>
 				</div>
 			</li>
 		`
