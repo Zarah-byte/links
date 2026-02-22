@@ -1,42 +1,53 @@
+/* ==============================
+   DESIGN TOKENS / CSS VARIABLES
+   Defined once here on :root so they can be reused everywhere.
+   Change a value here and it updates across the whole page.
+   ============================== */
 :root {
 	/* ======COLORS====== */
-	--color: #B1E4F9;
-	--black: #121212;
-	--white: #F0EFEC;
+	--color: #B1E4F9;     /* light blue accent (currently unused, kept for future use) */
+	--black: #121212;     /* near-black for text and borders */
+	--white: #F0EFEC;     /* warm off-white for backgrounds */
 
 
 	/* ======FONTS====== */
-	--body-copy: 1.25rem;
-	--small-copy: 1rem;
-	--h1-copy: 50rem;
-	--h2-copy: calc(var(--body-copy) * 1.5);
-	--h3-copy: calc(var(--body-copy) *1);
-	--font-body: "Syne", "helvetica", "san-serif";
-	--font-heading: "Bokor";
+	--body-copy: 1.25rem;                          /* base body font size */
+	--small-copy: 1rem;                            /* smaller text, used in footer/modal meta */
+	--h1-copy: 50rem;                              /* not currently used — placeholder */
+	--h2-copy: calc(var(--body-copy) * 1.5);       /* 1.5× the body size */
+	--h3-copy: calc(var(--body-copy) *1);          /* same as body size */
+	--font-body: "Syne", "helvetica", "san-serif"; /* main text font — loaded from Google Fonts */
+	--font-heading: "Bokor";                       /* display font for titles — loaded from Google Fonts */
 
 
 	/* ======SPACING====== */
-	--gutter: calc(var(--body-copy) * 1.5);
-	--padding-1: 1rem;
-	--padding-2: 2rem;
+	--gutter: calc(var(--body-copy) * 1.5); /* consistent gutter based on body font size */
+	--padding-1: 1rem;                       /* small padding unit */
+	--padding-2: 2rem;                       /* large padding unit */
 
 	/* ======SCROLL BEHAVIOUR====== */
-	scroll-behavior: smooth;
+	scroll-behavior: smooth; /* makes anchor links scroll smoothly instead of jumping */
 }
 
+
+/* ==============================
+   HEADER
+   ============================== */
 header {
 	padding: 1rem;
 	display: flex;
-	justify-content: space-between;
-	/* align-items: center; */
-	border-bottom: .1rem solid var(--black);
+	justify-content: space-between; /* logo on the left, Are.na icon on the right */
+	/* align-items: center; */       /* commented out — was centering vertically */
+	border-bottom: .1rem solid var(--black); /* thin rule under the header */
 
+	/* Logo SVG — sized to fit the header bar */
 	#logo {
 		fill: var(--black);
 		width: auto;
 		height: 2rem;
 	}
 
+	/* Are.na channel link icon in the header */
 	#channel-link {
 		fill: var(--black);
 		width: auto;
@@ -45,44 +56,74 @@ header {
 }
 
 
+/* ==============================
+   STICKY NAV BAR
+   ============================== */
 #navigation {
 	border-bottom: .1rem solid var(--black);
 	border-top: .1rem solid var(--black);
-	padding: 1rem;
+	padding: .6rem 1rem;
 	margin-bottom: 2rem;
 
+	/* Sticks to the top of the viewport as you scroll */
 	position: sticky;
-		position: sticky;
-		top: 0;
-		z-index: 1000;           /* bring it above main */
-		background: var(--white); /* or whatever your page bg is */
+	top: 0;
+	z-index: 1000;
+	background: var(--white);
 
-
-	ul {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		;
-		padding-left: 1rem;
-		padding-right: 1rem;
-	}
+	/* Spread buttons evenly across the full width */
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	gap: .5rem;
 }
 
-#navigation ::before {
-	border-top: 1rem var(--black);
+/* Base pill button style */
+#navigation button {
+	flex: 1;                          /* each button takes equal share of the width */
+	font-family: var(--font-body);
+	font-size: .75rem;
+	letter-spacing: .1em;
+	text-transform: uppercase;
+	cursor: pointer;
 
+	padding: .45rem .75rem;
+	border-radius: 10rem;             /* full pill shape */
+	border: .1rem solid var(--black);
+	background: transparent;
+	color: var(--black);
+
+	text-align: center;
+	white-space: nowrap;
+
+	transition:
+		background 0.2s ease,
+		color 0.2s ease;
 }
 
-#navigation ::after {
-	border-bottom: 1rem, var(--black);
+/* Hover state — subtle fill preview */
+#navigation button:hover {
+	background: rgba(18, 18, 18, 0.08);
 }
 
+/* Active/selected state — black fill, white text */
+#navigation button.active {
+	background: var(--black);
+	color: var(--white);
+}
+
+
+/* ==============================
+   BODY / BASE STYLES
+   ============================== */
 body {
 	font-family: var(--font-body);
 	background-color: var(--white);
 	color: var(--black);
 	font-size: 1rem;
 
+	/* All links on the page get an underline with a little breathing room */
 	a {
 		text-decoration: underline;
 		text-underline-offset: .25rem;
@@ -90,10 +131,14 @@ body {
 }
 
 
+/* ==============================
+   CHANNEL TITLE (hgroup)
+   The big heading at the top of the page — pulled from Are.na API.
+   ============================== */
 hgroup {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: center;       /* centres children horizontally */
 	width: 100%;
 	justify-content: space-between;
 	padding-bottom: 2rem;
@@ -101,33 +146,42 @@ hgroup {
 	h1 {
 		margin-top: 8rem;
 		margin-bottom: 4rem;
-		font-family: var(--font-heading);
-		font-size: 5rem;
+		font-family: var(--font-heading); /* Bokor display font */
+		font-size: 5rem;                  /* overridden at larger breakpoints below */
 		letter-spacing: .02em;
 		line-height: 1em;
 
 		text-align: center;
-		/* font-weight: bolder; */
+		/* font-weight: bolder; */         /* commented out — Bokor doesn't have a bold variant */
 		text-transform: uppercase;
 
 		color: var(--black);
 	}
 }
 
+
+/* ==============================
+   BLOCKS GRID
+   The main content area — a responsive grid of block cards.
+   ============================== */
 .blocks {
+	padding-top: 2rem;    /* stops the very first card from sitting inside the fade zone */
+	padding-bottom: 2rem; /* same for the last card at the bottom */
+
 	ul {
 		display: grid;
-		grid-template-columns: 1fr;
+		grid-template-columns: 1fr; /* mobile: single column */
 		/* mobile */
-		gap: 2rem;
+		gap: 2rem; /* space between grid cells */
 	}
 
 	li {
-		height: 80vh;
-		overflow: hidden;
-		/* margin-bottom: 4rem; */
-		border-radius: 1rem;
+		height: 80vh;         /* each card is 80% of the viewport height */
+		overflow: hidden;     /* clips media to the card's rounded corners */
+		/* margin-bottom: 4rem; */ /* commented out — gap handles spacing now */
+		/* border-radius: 1rem;  rounded corners on each card */
 
+		/* If a card contains a link, make it fill the whole card */
 		a {
 			display: block;
 			height: 100%;
@@ -135,11 +189,16 @@ hgroup {
 	}
 }
 
+
+/* ==============================
+   DESCRIPTION / ABOUT SECTION
+   Centred text block below the grid.
+   ============================== */
 .description {
 	display: block;
-	margin: auto;
+	margin: auto;         /* centres the block horizontally */
 	text-align: center;
-	max-width: 60ch;
+	max-width: 60ch;      /* 60 characters wide — keeps line lengths readable */
 
 	margin-top: 5rem;
 	margin-bottom: 8rem;
@@ -155,62 +214,65 @@ hgroup {
 		letter-spacing: .05em;
 	}
 
-
+	/* Underline on hover for links inside the description */
 	a:hover {
 		text-decoration: underline;
 		height: 100%;
 	}
 
+	/* The "Curated by" credit line */
 	.curate-tag {
 		padding-top: 1rem;
 	}
 }
 
 
-/* ============== MEDIA ============== */
+/* ==============================
+   MEDIA ELEMENTS
+   ============================== */
+
 .video-container {
-	width: 100%;
-	/* height: 100%; */
-	object-fit: cover;
-	overflow: clip;
-}
-
-/* 😭😭😭😭😭😭 How do i make to so that the video fills the container and clips  */
-
-img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	object-position: center;
-	display: block;
-
-	filter: blur(4.2px) sepia(0%);
+	overflow: clip;     /* clips the video to its container box */
 }
 
-img:hover {
-	filter: blur(0px) sepia(0%);
+/* All images on the page fill their container without distorting.
+   WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING — REMEMBERED IMG LECTURE FROM TYPE & INTERACTION 1
+   SOURCED FROM https://typography-interaction-2526.github.io/topic/images/#object-fit-object-position */
+img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;         /* scales and crops to fill the box */
+	object-position: center;   /* crop from the center */
+	display: block;            /* removes the small gap below inline images */
+
 }
 
-/* WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING REMEMBERED IMG LECTURE FROM TYPE & INTERACTION 1 */
-/* SOURCED FROM https://typography-interaction-2526.github.io/topic/images/#object-fit-object-position */
-
-.image-container { 
+/* Custom CSS variable for a decorative SVG overlay (work in progress) */
+.image-container {
 	--link-url: "/Users/zarahyaqub/Desktop/Parsons/Spring 2026/Type/SVG/Asset 3.svg";
-} 
+}
 
+/* Placeholder colours for embedded video/audio wrappers — useful for debugging layout */
 ul {
 	.cover-video {
-		color: red;
+		color: red;         /* marks video embeds in red so you can see them */
 	}
 
 	.cover-audio {
-		color: blueviolet;
+		color: blueviolet;  /* marks audio embeds in purple */
 	}
 }
 
 /* =================================== */
 
 
+/* ==============================
+   FOOTER
+   Shows the collaborator names pulled from the Are.na API.
+   ============================== */
 footer {
 	font-size: var(--small-copy);
 
@@ -219,74 +281,306 @@ footer {
 
 	display: flex;
 	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
+	justify-content: space-between; /* names spread to opposite ends */
+	align-items: center;            /* vertically centred
 
 	/* Googled "mdn center align" */
 	/* found align-items: center; */
 	/* https://developer.mozilla.org/en-US/docs/Web/CSS/How_to/Layout_cookbook/Center_an_element  */
 }
 
+
+/* ── Modal / Dialog ──────────────────────────────────────────────────────────
+   Clean stacked layout: image on top (contained, no cropping), meta below.
+   ────────────────────────────────────────────────────────────────────────── */
 #dialog {
 	margin: auto;
-	padding: 2rem;
-
-	width: min(720px, 90vw);
-	height: 80vh;
-	overflow: hidden;
+	padding: 0;
+	width: min(520px, 94vw);
+	max-height: 90vh;
+	overflow-y: auto;
+	overflow-x: hidden;
 
 	position: fixed;
 	inset: 0;
-	/* allows centering */
 
-	background: white;
-	border: none;
-	border-radius: 1rem;
+	/* Normal document flow — image stacks above meta */
+	display: flex;
+	flex-direction: column;
 
-	display: grid;
-	align-content: start;
-	gap: 1.5rem;
+	background: var(--black);
+	border: .1rem solid rgba(255,255,255,.15);
+	border-radius: 1.25rem;
 
-	/* subtle scale-in instead of slide */
-	transform: scale(.95);
+	transform: scale(.96) translateY(8px);
 	opacity: 0;
 	transition:
-		transform 0.35s cubic-bezier(.77, 0, .18, 1),
-		opacity 0.35s ease;
+		transform 0.3s cubic-bezier(.77, 0, .18, 1),
+		opacity    0.3s ease;
 }
 
-/* When open */
 #dialog[open] {
-	transform: scale(1);
+	transform: scale(1) translateY(0);
 	opacity: 1;
 }
 
-/* backdrop */
+body.modal-open {
+	overflow: hidden;
+}
+
 #dialog::backdrop {
-	background: rgba(0, 0, 0, 0.5);
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(8px);
+}
+
+/* ── Dialog media — image contained (not cropped) at top of card ── */
+.dialog-media {
+	position: relative;
+	width: 100%;
+	flex-shrink: 0;
+	background: var(--black);
+	border-radius: 1.15rem 1.15rem 0 0;
+	overflow: hidden;
+}
+
+/* Image fits fully within the modal width — no cropping */
+.dialog-media img {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: auto;
+	max-height: 55vh;
+	object-fit: contain;
+	object-position: center;
+	filter: none;
+}
+
+.dialog-media video {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: auto;
+	max-height: 55vh;
+	filter: none;
+}
+
+.dialog-media iframe,
+.dialog-media audio {
+	position: relative;
+	display: block;
+	width: 100%;
+	border: none;
+	background: var(--black);
+}
+
+/* Close button — anchored to top-right of the whole dialog */
+.dialog-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	z-index: 4;
+
+	padding: .3rem .65rem;
+	background: rgba(0, 0, 0, 0.4);
 	backdrop-filter: blur(6px);
+	border: .08rem solid rgba(255, 255, 255, 0.3);
+	border-radius: 999px;
+	color: white;
+	font-family: var(--font-body);
+	font-size: .85rem;
+	cursor: pointer;
+	line-height: 1;
+}
+
+/* Layer 5 — the text meta panel sits below the image */
+.dialog-meta {
+	background-color: var(--black);
+	position: relative;
+	z-index: 3;
+
+	padding: 1.5rem 1.75rem 1.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+
+	color: white;
+
+	transition: opacity 0.08s linear;
+}
+
+/* ── Dialog card layout ──────────────────────────────────────────────────────
+   Styled like a cocktail recipe card: monospaced type, all-caps labels,
+   dotted leader lines between label and value.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Top bar: block title on the left, block type (e.g. "IMAGE") on the right */
+.dialog-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	border-bottom: .08rem solid rgba(255, 255, 255, 0.3); /* subtle white rule */
+	padding-bottom: .6rem;
+}
+
+/* Block title — larger, readable weight */
+.dialog-title {
+	font-size: clamp(1rem, 3vw, 1.3rem);
+	font-weight: normal;
+	line-height: 1.2;
+	letter-spacing: .01em;
+	color: white;
+}
+
+/* Block type badge (IMAGE / LINK / TEXT etc.) */
+.dialog-type-badge {
+	font-size: .6rem;
+	letter-spacing: .15em;
+	text-transform: uppercase;
+	opacity: .6;
+	flex-shrink: 0;
+	margin-left: 1rem;
+	color: white;
+}
+
+/* Section label (SOURCE, ADDED, ADDED BY, TYPE) */
+.dialog-section-label {
+	font-size: .58rem;
+	letter-spacing: .18em;
+	text-transform: uppercase;
+	opacity: .55;
+	min-width: 6.5rem; /* wide enough for "ADDED BY" without wrapping */
+	flex-shrink: 0;
+	padding-top: .15rem;
+	color: white;
+}
+
+/* Metadata rows container */
+.dialog-extra-meta {
+	display: flex;
+	flex-direction: column;
+	gap: .45rem;
+}
+
+/* Each row: label + dotted leader + value */
+.dialog-meta-row {
+	display: flex;
+	align-items: baseline;
+	font-size: .78rem;
+	line-height: 1.4;
+	color: white;
+}
+
+/* Dotted leader line between label and value */
+.dialog-meta-leader {
+	flex: 1;
+	min-width: .5rem;
+	border-bottom: .1rem dotted rgba(255, 255, 255, 0.35); /* white dots instead of black */
+	margin: 0 .4rem .2rem;
+}
+
+/* Value side */
+.dialog-meta-value {
+	text-align: right;
+	word-break: break-all;
+	max-width: 60%;
+	color: white;
+}
+
+.dialog-meta-value a {
+	text-decoration: underline;
+	text-underline-offset: .2rem;
+	color: white;
+}
+
+/* Description text at the bottom */
+.dialog-description {
+	font-size: .82rem;
+	line-height: 1.7;
+	opacity: .8;
+	border-top: .08rem solid rgba(255, 255, 255, 0.2);
+	padding-top: .85rem;
+	color: white;
+}
+
+/* ── Dialog action buttons — pill style matching nav buttons ── */
+.dialog-actions {
+	display: flex;
+	gap: .6rem;
+	flex-wrap: wrap;
+}
+
+/* Base pill style shared by both action links */
+.dialog-source,
+.dialog-arena-link {
+	display: inline-block;
+	font-family: var(--font-body);
+	font-size: .75rem;
+	letter-spacing: .1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	text-align: center;
+	white-space: nowrap;
+	cursor: pointer;
+
+	padding: .45rem .9rem;
+	border-radius: 10rem;
+	border: .08rem solid rgba(255, 255, 255, 0.5);
+	background: transparent;
+	color: white;
+
+	transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.dialog-source:hover,
+.dialog-arena-link:hover {
+	background: rgba(255, 255, 255, 0.12);
+	border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* "See on Are.na" gets a filled style — primary action */
+.dialog-arena-link {
+	background: var(--white);
+	color: var(--black);
+	border-color: var(--white);
+}
+
+.dialog-arena-link:hover {
+	background: rgba(240, 239, 236, 0.85);
+	border-color: rgba(240, 239, 236, 0.85);
+	color: var(--black);
 }
 
 
-/* ======MEDIA QUERIES====== */
+
+
+/* ==============================
+   Progressively enhance the layout for larger screens.
+   We use a mobile-first approach: base styles are for mobile,
+   and these queries layer on changes for bigger viewports. */
+
 /* TABLET: 2 per row */
 @media (width > 768px) {
 	body {
-		font-size: 1.5rem;
+		font-size: 1.5rem; /* increase base font size on tablet */
 	}
 
+	/* Switch from 1 column to 2 columns */
 	.blocks {
+		padding-right: 2rem;
+		padding-left: 2rem;
 		ul {
 			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 
+	/* Bigger title on tablet */
 	hgroup {
 		h1 {
 			font-size: 10rem;
 		}
 	}
 
+	/* More breathing room on the sides */
 	footer {
 		margin-left: 2rem;
 		margin-right: 2rem;
@@ -297,16 +591,17 @@ footer {
 @media (width > 1200px) {
 	body {
 		font-size: 1.5rem;
-		font-kerning: normal;
+		font-kerning: normal; /* fine-tunes letter spacing for large text */
 	}
 
+	/* Switch from 2 columns to 3 columns */
 	.blocks {
 		ul {
 			grid-template-columns: repeat(3, 1fr);
 		}
 	}
 
-
+	/* Very large title on desktop */
 	hgroup {
 		h1 {
 			font-size: 18rem;
@@ -317,12 +612,14 @@ footer {
 		font-size: 1.5rem;
 	}
 
+	/* Larger heading in the About section on desktop */
 	.about {
 		h2 {
 			font-size: 5rem;
 		}
 	}
 
+	/* More horizontal padding in the nav on wide screens */
 	#navigation {
 		padding-left: 2rem;
 		padding-right: 2rem;

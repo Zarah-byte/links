@@ -19,16 +19,9 @@
 <body>
 
 	<header>
-
 		<a href="index.html">
 			<svg id="logo" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 497.46 251.54">
-				<defs>
-					<style>
-						.cls-1 {
-							fill: #231f20;
-						}
-					</style>
-				</defs>
+
 				<g id="Layer_1-2" data-name="Layer 1">
 					<path class="cls-1"
 						d="M10.73,51.68h119.38c5.92,0,10.73,4.81,10.73,10.73v142.16c0,20.92-16.98,37.9-37.9,37.9H37.9c-20.92,0-37.9-16.98-37.9-37.9V62.41c0-5.92,4.81-10.73,10.73-10.73Z" />
@@ -51,6 +44,9 @@
 		</a>
 	</header>
 	<main>
+		
+		<div class="behind" id="behind"></div>
+        <div id="glasses" class="glasses"></div>
 		<!-- <h1>Glassware</h1> -->
 		<hgroup>
 			<h1 id="channel-title"></h1>
@@ -58,53 +54,33 @@
 		<!-- <p><a id="channel-link">See on Are.na ↗</a></p> -->
 
 		<nav id="navigation">
-			<ul>
-				<li>
-					All
-				</li>
-				<li>
-					Look
-				</li>
-				<li>
-					Watch
-				</li>
-				<li>
-					Read
-				</li>
-				<li>
-					Listen
-				</li>
-			</ul>
+			<button data-filter="all">All</button>
+			<button data-filter="image">Images</button>
+			<button data-filter="attachment">Videos</button>
+			<button data-filter="text">Text</button>
+			<button data-filter="links">Links</button>
+			<button data-filter="audio">Audio</button>
 		</nav>
 
 		<!--================== Blocks ================== -->
 		<section class="blocks">
 			<!-- <h2>All blocks</h2> -->
 			<ul id="channel-blocks"></ul>
-			<p><span id="channel-count"></span></p>
+			<!-- <p><span id="channel-count"></span></p> -->
 		</section>
 
 
 		<section class="description">
 			<h2>About&nbsp;this&nbsp;collection</h2>
-			<p>This collection brings together an exploration of glassware, spanning historical context, techniques, and
-				visual inspiration. It layers imagery, videos, and links to highlight the versatility, beauty, and
-				technical ingenuity of glass.</p>
+			<p>This collection brings together an exploration of glassware, spanning historical context, techniques, and visual inspiration. It layers imagery, videos, and links to highlight the versatility, beauty, and technical ingenuity of glass.</p>
 
 			<p class="curate-tag">Curated and created in colaboration with Katie Lu on
 			<p><a id="channel-link">See on Are.na 🡭</a></p></a></p>
 
 		</section>
-		<!-- 
-		https://typography-interaction-2526.github.io/topic/javascript/#opening-a-modal -->
-		<button id="modal">Click here!</button>
-		<dialog id="dialog">
-			<p>This is a modal with an overlay!</p>
-			<button>Close it!</button>
-		</dialog>
+<!--Try Scrolling to increase/Decrease the circumference of the circle
+plus/minus to increase/decrease the blur -->
 	</main>
-
-
 	<footer id="channel-users">
 		<p class="curate-tag">
 			Katie Lu
