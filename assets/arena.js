@@ -20,21 +20,25 @@ const DEFAULT_FILTER = 'image'
 // I’m using `let` because this value needs to update every time the user switches categories.
 let currentFilter = DEFAULT_FILTER
 
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// MOBILE-ONLY "HOVER" HIGHLIGHT (IntersectionObserver) this was suggest and explained to be by Riya, i go more into detail below
+// MOBILE-ONLY “HOVER” HIGHLIGHT (IntersectionObserver)
+// This was suggested + explained to me by Riya — I’m using it to fake hover on mobile.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //
-// Desktop already has real :hover styles.
-// On mobile there is no hover, so we add/remove a `.highlight` class as cards
-// scroll into the “active zone” in the viewport.
+// On desktop, I already get real :hover styles.
+// But on mobile there’s no hover, so I simulate that “active card” feeling by
+// adding/removing a `.highlight` class when a card scrolls into a centered zone.
 //
-// We ONLY enable this behavior on mobile.
+// Key idea: ONLY run this on mobile / touch devices so desktop never gets weird/stuck.
 
 let cardObserver = null
+// I keep a media query handy so I can quickly tell when we’re in a “mobile width” layout.
 const mqMobileHighlight = window.matchMedia('(max-width: 768px)')
 
-// Decide if we should run the observer (mobile screens / touch devices)
+// Decide if I should turn this feature on.
+// I treat it as “mobile mode” if:
+// - the screen is <= 768px wide, OR
+// - the device doesn’t support hover and has a coarse pointer (aka most phones/tablets).
 function isMobileHighlightMode() {
 	return (
 		mqMobileHighlight.matches ||
@@ -42,59 +46,75 @@ function isMobileHighlightMode() {
 	)
 }
 
-// Build ONE observer that can watch all cards (more reliable + faster than 1 observer per card)
+// Create ONE IntersectionObserver that will watch ALL the cards.
+// This is cleaner + faster than making a separate observer per card.
 function buildCardObserver() {
 	return new IntersectionObserver(
 		(entries) => {
+			// The observer gives me a list of cards whose visibility changed.
 			entries.forEach((entry) => {
+				// If the card is inside the “active zone”, add `.highlight`.
+				// If it leaves that zone, remove `.highlight`.
 				entry.target.classList.toggle('highlight', entry.isIntersecting)
 			})
 		},
 		{
-			root: null,                    // viewport
-			rootMargin: '-35% 0px -35% 0px', // center “active zone” (mobile-friendly)
-			threshold: 0
+			root: null,                     // null = use the viewport as the “root”
+			// Shrink the top + bottom so the “active zone” becomes the middle strip of the screen.
+			// That way a card highlights when it’s roughly centered (more mobile-friendly).
+			rootMargin: '-35% 0px -35% 0px',
+			threshold: 0                   // trigger as soon as it touches the zone at all
 		}
 	)
 }
 
-// Re-connect observer to only the cards that are currently visible (not display:none)
+// Reconnect the observer to ONLY the cards that are currently visible.
+// (Important because my filters hide cards with display:none — no point observing those.)
 function refreshObserverTargets() {
 	if (!cardObserver) return
 
+	// First: stop observing everything so I can rebuild the list cleanly.
 	cardObserver.disconnect()
 
+	// Then: loop through all cards in the grid…
 	document.querySelectorAll('#channel-blocks > li').forEach((li) => {
+		// …and only observe the ones that are actually showing.
 		if (li.style.display !== 'none') cardObserver.observe(li)
 	})
 }
 
-// Turn ON highlight behavior (mobile only)
+// Turn ON the mobile highlight feature.
+// If it’s already on, I don’t recreate it.
 function enableMobileHighlights() {
 	if (cardObserver) return
 	cardObserver = buildCardObserver()
 	refreshObserverTargets()
 }
 
-// Turn OFF highlight behavior (desktop + cleanup)
+// Turn OFF the mobile highlight feature (and clean up).
 function disableMobileHighlights() {
 	if (!cardObserver) return
+
+	// Stop watching everything and fully remove the observer.
 	cardObserver.disconnect()
 	cardObserver = null
 
-	// Remove leftover highlights so desktop never looks “stuck”
+	// Also remove any leftover `.highlight` classes so desktop never looks “stuck”.
 	document.querySelectorAll('#channel-blocks > li.highlight').forEach((li) => {
 		li.classList.remove('highlight')
 	})
 }
 
-// Keep highlight mode correct when the user resizes or rotates the device
+// Keep the feature correctly enabled/disabled if the screen size changes
+// (like rotating the phone or resizing the browser).
 function syncHighlightMode() {
 	if (isMobileHighlightMode()) enableMobileHighlights()
 	else disableMobileHighlights()
 }
 
-// Update highlight mode on resize/orientation changes
+// Listen for breakpoint changes + resize/rotation, and re-sync the mode.
+// Optional chaining on addEventListener is just a safety check in case the browser
+// doesn’t support it on MediaQueryList (older browsers).
 mqMobileHighlight.addEventListener?.('change', syncHighlightMode)
 window.addEventListener('resize', syncHighlightMode)
 window.addEventListener('orientationchange', syncHighlightMode)

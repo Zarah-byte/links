@@ -321,8 +321,7 @@ footer {
 	font-size: var(--small-copy);
 	margin: 1rem 1rem 2rem;
 	display: flex;
-	justify-content: space-between;
-	align-items: center;
+	flex-direction: column;
 }
 
 .description {
@@ -647,6 +646,10 @@ footer {
 	footer {
 		margin-left: 2rem;
 		margin-right: 2rem;
+
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
 	}
 }
 
