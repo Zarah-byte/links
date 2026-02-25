@@ -78,8 +78,8 @@ Mobile doesn’t have real hover states, so the project uses an **IntersectionOb
 
 ## Tech Stack
 
-- **HTML5**
-- **CSS3** (design tokens + responsive layout)
+- **HTML**
+- **CSS** (design tokens + responsive layout)
 - **Vanilla JavaScript**
 - **Are.na API**
 - **Typography:** Google Fonts (**Syne** + **Bokor**)
