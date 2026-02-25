@@ -6,6 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- META TAG https://typography-interaction-2526.github.io/topic/responsive/#viewport-meta-tag -->
 	<link rel="stylesheet" href="reset.css">
+	<!-- <link rel="stylesheet" href="assets/style.css"> -->
 	<link rel="stylesheet" href="assets/style.css">
 	<script defer src="assets/arena.js"></script>
 	<!-- ==============FONTS ============== -->
@@ -17,7 +18,6 @@
 </head>
 
 <body>
-
 	<header>
 		<a href="index.html">
 			<svg id="logo" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 497.46 251.54">
@@ -44,22 +44,34 @@
 		</a>
 	</header>
 	<main>
-		
-		<div class="behind" id="behind"></div>
-        <div id="glasses" class="glasses"></div>
-		<!-- <h1>Glassware</h1> -->
 		<hgroup>
-			<h1 id="channel-title"></h1>
+			<h1> Raise your Glass!</h1>
 		</hgroup>
-		<!-- <p><a id="channel-link">See on Are.na ↗</a></p> -->
+		<!-- <p>This collection brings together an exploration of glassware, spanning historical context, techniques, and visual inspiration. It layers imagery, videos, and links to highlight the versatility, beauty, and technical ingenuity of glass.</p> -->
 
 		<nav id="navigation">
-			<button data-filter="all">All</button>
-			<button data-filter="image">Images</button>
-			<button data-filter="attachment">Videos</button>
-			<button data-filter="text">Text</button>
-			<button data-filter="links">Links</button>
-			<button data-filter="audio">Audio</button>
+
+			<!-- Desktop buttons -->
+			<div class="filter-buttons">
+				<button type="button" data-filter="image">LOOK</button>
+				<button type="button" data-filter="attachment">WATCH</button>
+				<button type="button" data-filter="text">READ</button>
+				<button type="button" data-filter="links">EXPLORE</button>
+				<button type="button" data-filter="audio">LISTEN</button>
+			</div>
+
+			<!-- Mobile dropdown (this is what your JS/CSS are expecting) -->
+			<div id="filter-select">
+				<div id="filter-selected">LOOK</div>
+				<ul id="filter-options">
+					<li data-value="image">LOOK</li>
+					<li data-value="attachment">WATCH</li>
+					<li data-value="text">READ</li>
+					<li data-value="links">EXPLORE</li>
+					<li data-value="audio">LISTEN</li>
+				</ul>
+			</div>
+
 		</nav>
 
 		<!--================== Blocks ================== -->
@@ -69,23 +81,18 @@
 			<!-- <p><span id="channel-count"></span></p> -->
 		</section>
 
-
 		<section class="description">
 			<h2>About&nbsp;this&nbsp;collection</h2>
-			<p>This collection brings together an exploration of glassware, spanning historical context, techniques, and visual inspiration. It layers imagery, videos, and links to highlight the versatility, beauty, and technical ingenuity of glass.</p>
+			<p>This collection brings together an exploration of glassware, spanning historical context, techniques, and
+				visual inspiration. It layers imagery, videos, and links to highlight the versatility, beauty, and
+				technical ingenuity of glass.</p>
 
-			<p class="curate-tag">Curated and created in colaboration with Katie Lu on
-			<p><a id="channel-link">See on Are.na 🡭</a></p></a></p>
-
+			<p class="curate-tag">Curated and created in collaboration with Katie Lu.
 		</section>
-<!--Try Scrolling to increase/Decrease the circumference of the circle
-plus/minus to increase/decrease the blur -->
 	</main>
-	<footer id="channel-users">
-		<p class="curate-tag">
-			Katie Lu
-			<!-- <a id="channel-link">See on Are.na 🡭</a> -->
-		</p>
+	<footer>
+		<p>Curated by <a href="https://luk862-glitch.github.io/">Katie Lu</a></p>
+		<p>Designed & Coded by <a href="zarah-byte.github.io/">Zarah Yaqub</a></p>
 	</footer>
 </body>
 

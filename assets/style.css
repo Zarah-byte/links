@@ -1,627 +1,722 @@
-/* ==============================
-   DESIGN TOKENS / CSS VARIABLES
-   Defined once here on :root so they can be reused everywhere.
-   Change a value here and it updates across the whole page.
-   ============================== */
+/* ===================== DESIGN TOKENS ===================== */
 :root {
-	/* ======COLORS====== */
-	--color: #B1E4F9;     /* light blue accent (currently unused, kept for future use) */
-	--black: #121212;     /* near-black for text and borders */
-	--white: #F0EFEC;     /* warm off-white for backgrounds */
+	--background: #F0EFEC;
+	--text: #121212;
 
+	--accent-pdf: #111414;
+	--accent-link: #2d4a3e;
 
-	/* ======FONTS====== */
-	--body-copy: 1.25rem;                          /* base body font size */
-	--small-copy: 1rem;                            /* smaller text, used in footer/modal meta */
-	--h1-copy: 50rem;                              /* not currently used — placeholder */
-	--h2-copy: calc(var(--body-copy) * 1.5);       /* 1.5× the body size */
-	--h3-copy: calc(var(--body-copy) *1);          /* same as body size */
-	--font-body: "Syne", "helvetica", "san-serif"; /* main text font — loaded from Google Fonts */
-	--font-heading: "Bokor";                       /* display font for titles — loaded from Google Fonts */
+	--accent-video: #1f2b26;
 
+	--media-border: 0.5rem solid var(--background);
+	--embed-scale: 1.35;
 
-	/* ======SPACING====== */
-	--gutter: calc(var(--body-copy) * 1.5); /* consistent gutter based on body font size */
-	--padding-1: 1rem;                       /* small padding unit */
-	--padding-2: 2rem;                       /* large padding unit */
+	--body-copy: 1.25rem;
+	--small-copy: 1rem;
+	--h2-copy: calc(var(--body-copy) * 1.5);
+	--h3-copy: var(--body-copy);
+	--font-body: "Syne", "Helvetica", sans-serif;
+	--font-heading: "Bokor", serif;
 
-	/* ======SCROLL BEHAVIOUR====== */
-	scroll-behavior: smooth; /* makes anchor links scroll smoothly instead of jumping */
+	--gutter: calc(var(--body-copy) * 1.5);
+	--padding-1: 1rem;
+	--padding-2: 2rem;
+
+	scroll-behavior: smooth;
 }
 
-
-/* ==============================
-   HEADER
-   ============================== */
-header {
-	padding: 1rem;
-	display: flex;
-	justify-content: space-between; /* logo on the left, Are.na icon on the right */
-	/* align-items: center; */       /* commented out — was centering vertically */
-	border-bottom: .1rem solid var(--black); /* thin rule under the header */
-
-	/* Logo SVG — sized to fit the header bar */
-	#logo {
-		fill: var(--black);
-		width: auto;
-		height: 2rem;
-	}
-
-	/* Are.na channel link icon in the header */
-	#channel-link {
-		fill: var(--black);
-		width: auto;
-		height: 2rem;
-	}
-}
-
-
-/* ==============================
-   STICKY NAV BAR
-   ============================== */
-#navigation {
-	border-bottom: .1rem solid var(--black);
-	border-top: .1rem solid var(--black);
-	padding: .6rem 1rem;
-	margin-bottom: 2rem;
-
-	/* Sticks to the top of the viewport as you scroll */
-	position: sticky;
-	top: 0;
-	z-index: 1000;
-	background: var(--white);
-
-	/* Spread buttons evenly across the full width */
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	gap: .5rem;
-}
-
-/* Base pill button style */
-#navigation button {
-	flex: 1;                          /* each button takes equal share of the width */
-	font-family: var(--font-body);
-	font-size: .75rem;
-	letter-spacing: .1em;
-	text-transform: uppercase;
-	cursor: pointer;
-
-	padding: .45rem .75rem;
-	border-radius: 10rem;             /* full pill shape */
-	border: .1rem solid var(--black);
-	background: transparent;
-	color: var(--black);
-
-	text-align: center;
-	white-space: nowrap;
-
-	transition:
-		background 0.2s ease,
-		color 0.2s ease;
-}
-
-/* Hover state — subtle fill preview */
-#navigation button:hover {
-	background: rgba(18, 18, 18, 0.08);
-}
-
-/* Active/selected state — black fill, white text */
-#navigation button.active {
-	background: var(--black);
-	color: var(--white);
-}
-
-
-/* ==============================
-   BODY / BASE STYLES
-   ============================== */
+/* ===================== BASE ===================== */
 body {
 	font-family: var(--font-body);
-	background-color: var(--white);
-	color: var(--black);
+	background: var(--text);
+	color: var(--background);
 	font-size: 1rem;
 
-	/* All links on the page get an underline with a little breathing room */
 	a {
+		color: inherit;
 		text-decoration: underline;
-		text-underline-offset: .25rem;
+		text-underline-offset: 0.25rem;
 	}
-}
-
-
-/* ==============================
-   CHANNEL TITLE (hgroup)
-   The big heading at the top of the page — pulled from Are.na API.
-   ============================== */
-hgroup {
-	display: flex;
-	flex-direction: column;
-	align-items: center;       /* centres children horizontally */
-	width: 100%;
-	justify-content: space-between;
-	padding-bottom: 2rem;
-
-	h1 {
-		margin-top: 8rem;
-		margin-bottom: 4rem;
-		font-family: var(--font-heading); /* Bokor display font */
-		font-size: 5rem;                  /* overridden at larger breakpoints below */
-		letter-spacing: .02em;
-		line-height: 1em;
-
-		text-align: center;
-		/* font-weight: bolder; */         /* commented out — Bokor doesn't have a bold variant */
-		text-transform: uppercase;
-
-		color: var(--black);
-	}
-}
-
-
-/* ==============================
-   BLOCKS GRID
-   The main content area — a responsive grid of block cards.
-   ============================== */
-.blocks {
-	padding-top: 2rem;    /* stops the very first card from sitting inside the fade zone */
-	padding-bottom: 2rem; /* same for the last card at the bottom */
-
-	ul {
-		display: grid;
-		grid-template-columns: 1fr; /* mobile: single column */
-		/* mobile */
-		gap: 2rem; /* space between grid cells */
-	}
-
-	li {
-		height: 80vh;         /* each card is 80% of the viewport height */
-		overflow: hidden;     /* clips media to the card's rounded corners */
-		/* margin-bottom: 4rem; */ /* commented out — gap handles spacing now */
-		/* border-radius: 1rem;  rounded corners on each card */
-
-		/* If a card contains a link, make it fill the whole card */
-		a {
-			display: block;
-			height: 100%;
-		}
-	}
-}
-
-
-/* ==============================
-   DESCRIPTION / ABOUT SECTION
-   Centred text block below the grid.
-   ============================== */
-.description {
-	display: block;
-	margin: auto;         /* centres the block horizontally */
-	text-align: center;
-	max-width: 60ch;      /* 60 characters wide — keeps line lengths readable */
-
-	margin-top: 5rem;
-	margin-bottom: 8rem;
-
-	padding-left: 1rem;
-	padding-right: 1rem;
-
-	h2 {
-		font-family: var(--font-heading);
-		font-size: var(--h2-copy);
-		text-transform: uppercase;
-		/* font-weight: bolder; */
-		letter-spacing: .05em;
-	}
-
-	/* Underline on hover for links inside the description */
-	a:hover {
-		text-decoration: underline;
-		height: 100%;
-	}
-
-	/* The "Curated by" credit line */
-	.curate-tag {
-		padding-top: 1rem;
-	}
-}
-
-
-/* ==============================
-   MEDIA ELEMENTS
-   ============================== */
-
-.video-container {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	overflow: clip;     /* clips the video to its container box */
-}
-
-/* All images on the page fill their container without distorting.
-   WANTED IMAGE TO FIT THE SHAPE WITHOUT DISTORITING — REMEMBERED IMG LECTURE FROM TYPE & INTERACTION 1
-   SOURCED FROM https://typography-interaction-2526.github.io/topic/images/#object-fit-object-position */
-img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;         /* scales and crops to fill the box */
-	object-position: center;   /* crop from the center */
-	display: block;            /* removes the small gap below inline images */
-
-}
-
-/* Custom CSS variable for a decorative SVG overlay (work in progress) */
-.image-container {
-	--link-url: "/Users/zarahyaqub/Desktop/Parsons/Spring 2026/Type/SVG/Asset 3.svg";
-}
-
-/* Placeholder colours for embedded video/audio wrappers — useful for debugging layout */
-ul {
-	.cover-video {
-		color: red;         /* marks video embeds in red so you can see them */
-	}
-
-	.cover-audio {
-		color: blueviolet;  /* marks audio embeds in purple */
-	}
-}
-
-/* =================================== */
-
-
-/* ==============================
-   FOOTER
-   Shows the collaborator names pulled from the Are.na API.
-   ============================== */
-footer {
-	font-size: var(--small-copy);
-
-	position: relative;
-	margin: 1rem 1rem 2rem;
-
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between; /* names spread to opposite ends */
-	align-items: center;            /* vertically centred
-
-	/* Googled "mdn center align" */
-	/* found align-items: center; */
-	/* https://developer.mozilla.org/en-US/docs/Web/CSS/How_to/Layout_cookbook/Center_an_element  */
-}
-
-
-/* ── Modal / Dialog ──────────────────────────────────────────────────────────
-   Clean stacked layout: image on top (contained, no cropping), meta below.
-   ────────────────────────────────────────────────────────────────────────── */
-#dialog {
-	margin: auto;
-	padding: 0;
-	width: min(520px, 94vw);
-	max-height: 90vh;
-	overflow-y: auto;
-	overflow-x: hidden;
-
-	position: fixed;
-	inset: 0;
-
-	/* Normal document flow — image stacks above meta */
-	display: flex;
-	flex-direction: column;
-
-	background: var(--black);
-	border: .1rem solid rgba(255,255,255,.15);
-	border-radius: 1.25rem;
-
-	transform: scale(.96) translateY(8px);
-	opacity: 0;
-	transition:
-		transform 0.3s cubic-bezier(.77, 0, .18, 1),
-		opacity    0.3s ease;
-}
-
-#dialog[open] {
-	transform: scale(1) translateY(0);
-	opacity: 1;
 }
 
 body.modal-open {
 	overflow: hidden;
 }
 
-#dialog::backdrop {
-	background: rgba(0, 0, 0, 0.6);
-	backdrop-filter: blur(8px);
+/* ===================== HEADER ===================== */
+header {
+	padding: 1rem;
+	display: flex;
+	justify-content: space-between;
+	border-bottom: 0.2rem solid var(--background);
+
+	#logo,
+	#channel-link {
+		fill: var(--background);
+		width: auto;
+		height: 2rem;
+	}
 }
 
-/* ── Dialog media — image contained (not cropped) at top of card ── */
-.dialog-media {
-	position: relative;
-	width: 100%;
-	flex-shrink: 0;
-	background: var(--black);
-	border-radius: 1.15rem 1.15rem 0 0;
+/* ===================== NAV ===================== */
+#navigation {
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+
+	padding: 1rem;
+	margin-bottom: 2rem;
+	background: var(--text);
+	border-top: 0.2rem solid var(--background);
+	border-bottom: 0.2rem solid var(--background);
+
+	.filter-buttons {
+		display: flex;
+		justify-content: space-between;
+		gap: 2rem;
+	}
+
+	button {
+		flex: 1;
+		cursor: pointer;
+
+		font-family: var(--font-body);
+		font-size: 1rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		text-align: center;
+
+		padding: 0.45rem 0.75rem;
+		border-radius: 10rem;
+		border: 0.1rem solid var(--background);
+		background: transparent;
+		color: var(--background);
+		transition: background 0.2s ease, color 0.2s ease;
+	}
+
+	button.active {
+		background: var(--background);
+		color: var(--text);
+	}
+
+	#filter-options li.is-selected {
+		background: var(--background);
+		color: var(--text);
+	}
+}
+
+
+
+#filter-select {
+	display: none;
+}
+
+/* Mobile */
+@media (width <=768px) {
+	.filter-buttons {
+		display: none;
+	}
+
+	#filter-select {
+		display: block;
+		width: 100%;
+	}
+}
+
+#filter-selected {
+	border: 0.1rem solid var(--background);
+	border-radius: 10rem;
+	padding: 0.6rem 0.9rem;
+	cursor: pointer;
+	user-select: none;
+	transition: background 0.2s ease;
+}
+
+#filter-options {
+	display: none;
+	margin-top: 0.5rem;
+	border: 0.1rem solid var(--background);
+	border-radius: 1rem;
 	overflow: hidden;
 }
 
-/* Image fits fully within the modal width — no cropping */
-.dialog-media img {
-	position: relative;
-	display: block;
-	width: 100%;
-	height: auto;
-	max-height: 55vh;
-	object-fit: contain;
-	object-position: center;
-	filter: none;
-}
-
-.dialog-media video {
-	position: relative;
-	display: block;
-	width: 100%;
-	height: auto;
-	max-height: 55vh;
-	filter: none;
-}
-
-.dialog-media iframe,
-.dialog-media audio {
-	position: relative;
-	display: block;
-	width: 100%;
-	border: none;
-	background: var(--black);
-}
-
-/* Close button — anchored to top-right of the whole dialog */
-.dialog-close {
-	position: absolute;
-	top: 1rem;
-	right: 1rem;
-	z-index: 4;
-
-	padding: .3rem .65rem;
-	background: rgba(0, 0, 0, 0.4);
-	backdrop-filter: blur(6px);
-	border: .08rem solid rgba(255, 255, 255, 0.3);
-	border-radius: 999px;
-	color: white;
-	font-family: var(--font-body);
-	font-size: .85rem;
-	cursor: pointer;
-	line-height: 1;
-}
-
-/* Layer 5 — the text meta panel sits below the image */
-.dialog-meta {
-	background-color: var(--black);
-	position: relative;
-	z-index: 3;
-
-	padding: 1.5rem 1.75rem 1.75rem;
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-
-	color: white;
-
-	transition: opacity 0.08s linear;
-}
-
-/* ── Dialog card layout ──────────────────────────────────────────────────────
-   Styled like a cocktail recipe card: monospaced type, all-caps labels,
-   dotted leader lines between label and value.
-   ────────────────────────────────────────────────────────────────────────── */
-
-/* Top bar: block title on the left, block type (e.g. "IMAGE") on the right */
-.dialog-card-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: baseline;
-	border-bottom: .08rem solid rgba(255, 255, 255, 0.3); /* subtle white rule */
-	padding-bottom: .6rem;
-}
-
-/* Block title — larger, readable weight */
-.dialog-title {
-	font-size: clamp(1rem, 3vw, 1.3rem);
-	font-weight: normal;
-	line-height: 1.2;
-	letter-spacing: .01em;
-	color: white;
-}
-
-/* Block type badge (IMAGE / LINK / TEXT etc.) */
-.dialog-type-badge {
-	font-size: .6rem;
-	letter-spacing: .15em;
-	text-transform: uppercase;
-	opacity: .6;
-	flex-shrink: 0;
-	margin-left: 1rem;
-	color: white;
-}
-
-/* Section label (SOURCE, ADDED, ADDED BY, TYPE) */
-.dialog-section-label {
-	font-size: .58rem;
-	letter-spacing: .18em;
-	text-transform: uppercase;
-	opacity: .55;
-	min-width: 6.5rem; /* wide enough for "ADDED BY" without wrapping */
-	flex-shrink: 0;
-	padding-top: .15rem;
-	color: white;
-}
-
-/* Metadata rows container */
-.dialog-extra-meta {
-	display: flex;
-	flex-direction: column;
-	gap: .45rem;
-}
-
-/* Each row: label + dotted leader + value */
-.dialog-meta-row {
-	display: flex;
-	align-items: baseline;
-	font-size: .78rem;
-	line-height: 1.4;
-	color: white;
-}
-
-/* Dotted leader line between label and value */
-.dialog-meta-leader {
-	flex: 1;
-	min-width: .5rem;
-	border-bottom: .1rem dotted rgba(255, 255, 255, 0.35); /* white dots instead of black */
-	margin: 0 .4rem .2rem;
-}
-
-/* Value side */
-.dialog-meta-value {
-	text-align: right;
-	word-break: break-all;
-	max-width: 60%;
-	color: white;
-}
-
-.dialog-meta-value a {
-	text-decoration: underline;
-	text-underline-offset: .2rem;
-	color: white;
-}
-
-/* Description text at the bottom */
-.dialog-description {
-	font-size: .82rem;
-	line-height: 1.7;
-	opacity: .8;
-	border-top: .08rem solid rgba(255, 255, 255, 0.2);
-	padding-top: .85rem;
-	color: white;
-}
-
-/* ── Dialog action buttons — pill style matching nav buttons ── */
-.dialog-actions {
-	display: flex;
-	gap: .6rem;
-	flex-wrap: wrap;
-}
-
-/* Base pill style shared by both action links */
-.dialog-source,
-.dialog-arena-link {
-	display: inline-block;
-	font-family: var(--font-body);
-	font-size: .75rem;
-	letter-spacing: .1em;
-	text-transform: uppercase;
-	text-decoration: none;
-	text-align: center;
-	white-space: nowrap;
+#filter-options li {
+	padding: 0.8rem 1rem;
 	cursor: pointer;
 
-	padding: .45rem .9rem;
-	border-radius: 10rem;
-	border: .08rem solid rgba(255, 255, 255, 0.5);
-	background: transparent;
-	color: white;
-
-	transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.dialog-source:hover,
-.dialog-arena-link:hover {
-	background: rgba(255, 255, 255, 0.12);
-	border-color: rgba(255, 255, 255, 0.8);
-}
-
-/* "See on Are.na" gets a filled style — primary action */
-.dialog-arena-link {
-	background: var(--white);
-	color: var(--black);
-	border-color: var(--white);
-}
-
-.dialog-arena-link:hover {
-	background: rgba(240, 239, 236, 0.85);
-	border-color: rgba(240, 239, 236, 0.85);
-	color: var(--black);
+	.is-selected {
+		background: var(--background);
+		color: var(--text);
+	}
 }
 
 
+/* ===================== TITLE ===================== */
+hgroup {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
 
+	h1 {
+		margin-top: 8rem;
+		padding-bottom: 10rem;
+		font-family: var(--font-heading);
+		font-size: 5rem;
+		letter-spacing: 0.01em;
+		line-height: 1;
+		text-align: center;
+		text-transform: uppercase;
+	}
+}
 
-/* ==============================
-   Progressively enhance the layout for larger screens.
-   We use a mobile-first approach: base styles are for mobile,
-   and these queries layer on changes for bigger viewports. */
+/* ===================== GRID ===================== */
+.blocks {
+	padding: 2rem 0;
 
-/* TABLET: 2 per row */
-@media (width > 768px) {
-	body {
-		font-size: 1.5rem; /* increase base font size on tablet */
+	ul {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		padding: 0 0.5rem;
 	}
 
-	/* Switch from 1 column to 2 columns */
-	.blocks {
+	li {
+		height: 90vh;
+	}
+
+	li.clickable {
+		cursor: pointer;
+	}
+
+	li:nth-child(2n+1):hover {
+		transform: rotate(-5deg);
+	}
+}
+
+/* Card frame */
+.blocks li {
+	border: var(--media-border);
+	border-radius: 1.25rem;
+	overflow: hidden;
+	transition: border-color 0.2s ease, transform 0.2s ease;
+
+	&:hover,
+	&.highlight {
+		/* Mobile uses `.highlight` (IntersectionObserver), desktop uses `:hover` */
+		transform: rotate(5deg) scale(0.8);
+		border-color: color-mix(in srgb, var(--background) 85%, transparent);
+	}
+
+	&:nth-child(2n+1):hover,
+	&:nth-child(2n+1).highlight {
+		transform: rotate(-5deg) scale(0.8);
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
+
+	&:focus-visible {
+		outline: 0.2rem solid color-mix(in srgb, var(--background) 70%, transparent);
+		outline-offset: 0.25rem;
+	}
+}
+
+/* ===================== MEDIA STUFF ===================== */
+.media-frame {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.media-fill {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+:is(img, video).media-fill {
+	object-fit: cover;
+	object-position: center;
+}
+
+#channel-blocks .media-frame.embed-wrapper {
+	position: relative;
+	overflow: hidden;
+}
+
+#channel-blocks .embed-wrapper .media-fill:is(iframe, video) {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	transform: scale(var(--embed-scale));
+	border: 0;
+}
+
+/* ===================== AUDIO TILE ===================== */
+.audio-card {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+
+	background: var(--accent-pdf);
+	color: var(--background);
+	text-align: center;
+	padding: 2rem;
+
+	.audio-icon {
+		font-size: 3rem;
+		opacity: 0.4;
+	}
+
+	.audio-title {
+		font-size: 1rem;
+		font-weight: 600;
+	}
+
+	.audio-sub {
+		font-size: 0.7rem;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		opacity: 0.45;
+	}
+}
+
+/* ===================== TEXT TILE ===================== */
+.text-block {
+	.text-content {
+		height: 100%;
+		padding: 1.5rem;
+		display: flex;
+		align-items: flex-start;
+
+		p {
+			padding-top: 4rem;
+			text-align: center;
+			font-size: 1rem;
+			line-height: 2;
+		}
+	}
+}
+
+.media-placeholder {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem;
+	text-align: center;
+	font-size: 0.85rem;
+	opacity: 0.5;
+}
+
+/* ===================== FOOTER + ABOUT ===================== */
+footer {
+	font-size: var(--small-copy);
+	margin: 1rem 1rem 2rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.description {
+	margin: 5rem auto 8rem;
+	padding: 0 1rem;
+	max-width: 60ch;
+	text-align: center;
+
+	h2 {
+		font-family: var(--font-heading);
+		font-size: var(--h2-copy);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	a:hover {
+		text-decoration: underline;
+	}
+
+	.curate-tag {
+		padding-top: 1rem;
+	}
+}
+
+/* ===================== PDF + VIDEO PREVIEWS ===================== */
+
+.pdf-preview {
+	position: relative;
+
+	::after {
+		content: 'PDF';
+		position: absolute;
+		bottom: 0.75rem;
+		left: 0.75rem;
+
+		font-size: 0.6rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+
+		color: var(--background);
+		background: rgba(0, 0, 0, 0.55);
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		pointer-events: none;
+	}
+}
+
+.media-type-tile {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: 2rem;
+	text-align: center;
+	color: var(--background);
+}
+
+.media-type-label {
+	font-size: 0.6rem;
+	letter-spacing: 0.25em;
+	text-transform: uppercase;
+	opacity: 0.65;
+	border: 0.08rem solid var(--accent-pdf);
+	padding: 0.3rem 0.65rem;
+	border-radius: 4px;
+}
+
+.media-type-title {
+	font-family: var(--font-heading);
+	font-size: 1.5rem;
+	line-height: 1.25;
+}
+
+.pdf-tile {
+	background: var(--accent-pdf);
+}
+
+.video-tile {
+	background: var(--accent-video);
+}
+
+/* ===================== MODAL ===================== */
+#dialog {
+	position: fixed;
+	inset: 0;
+	margin: auto;
+
+	width: min(560px, 92vw);
+	max-height: 90vh;
+	padding: 0;
+
+	display: none;
+	flex-direction: column;
+	overflow: hidden;
+
+	background: var(--background);
+	color: var(--text);
+	font-family: var(--font-body);
+	border-radius: 1.5rem;
+
+	border: var(--media-border);
+
+	transform: scale(0.95) translateY(1rem);
+	opacity: 0;
+	transition:
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.25s ease;
+
+	&[open] {
+		display: flex;
+		transform: none;
+		opacity: 1;
+	}
+
+	&::backdrop {
+		background: rgba(18, 18, 18, 0.55);
+		backdrop-filter: blur(6px);
+		-webkit-backdrop-filter: blur(6px);
+	}
+
+	.dialog-close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		z-index: 10;
+
+		width: 2rem;
+		height: 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		background: transparent;
+		border: 0;
+		color: var(--text);
+		cursor: pointer;
+		opacity: 0.5;
+		transition: opacity 0.15s ease;
+
+		svg {
+			display: block;
+		}
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+
+	.dialog-meta {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow: auto;
+
+		padding: 1.75rem 1.75rem 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.dialog-title {
+		font-family: var(--font-heading);
+		font-size: 1.6rem;
+		letter-spacing: 0.01em;
+		line-height: 1.2;
 		padding-right: 2rem;
-		padding-left: 2rem;
+	}
+
+	.dialog-extra-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+		padding-bottom: 0.25rem;
+	}
+
+	.dialog-meta-row {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		font-size: 0.72rem;
+		line-height: 1.5;
+
+		.dialog-section-label {
+			font-family: var(--font-heading);
+			font-size: 0.8rem;
+			min-width: 7rem;
+			flex-shrink: 0;
+		}
+
+		.dialog-meta-value {
+			font-size: 0.8rem;
+			text-align: right;
+			overflow-wrap: break-word;
+
+			a {
+				color: inherit;
+				text-decoration: underline;
+				text-underline-offset: 0.2rem;
+			}
+		}
+	}
+
+	.dialog-description {
+		font-size: 0.875rem;
+		line-height: 1.65;
+		opacity: 0.75;
+	}
+
+	.dialog-actions {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		padding-top: 0.25rem;
+	}
+
+	.dialog-source,
+	.dialog-arena-link {
+		flex: 1;
+		display: inline-block;
+
+		font-size: 0.9rem;
+		text-transform: uppercase;
+		text-decoration: none;
+		text-align: center;
+		background-color: var(--text);
+		color: var(--background);
+
+
+		padding: 0.6rem 1rem;
+		border-radius: 10rem;
+
+
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+		:hover {
+			background: var(--text);
+			color: var(--background);
+			border-color: var(--text);
+		}
+	}
+
+	.dialog-source[hidden] {
+		display: none;
+	}
+
+	.dialog-media {
+		flex: 0 0 auto;
+		overflow: hidden;
+		border-radius: 0 0 1.5rem 1.5rem;
+
+
+		:is(img, video, iframe) {
+			display: block;
+			width: 100%;
+			border: 0;
+		}
+
+		img,
+		video {
+			max-height: 60vh;
+		}
+
+		video {
+			object-fit: cover;
+		}
+
+		img {
+			object-fit: cover;
+			object-position: center;
+		}
+	}
+
+	.dialog-media {
+		height: 55vh;
+
+		:is(video, iframe) {
+			height: 100%;
+			max-height: none;
+		}
+	}
+
+
+	.pdf-open-link {
+		display: block;
+		text-align: center;
+		padding: 0.6rem;
+		font-size: 0.7rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		background: var(--background);
+		color: var(--text);
+		text-decoration: none;
+		border-top: 0.08rem solid color-mix(in srgb, var(--text) 15%, transparent);
+	}
+}
+
+
+
+
+
+/* ===================== BREAKPOINTS ===================== */
+
+@media (width > 768px) {
+	body {
+		font-size: 1.5rem;
+	}
+
+	.blocks {
+		padding: 2rem;
+
 		ul {
 			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 
-	/* Bigger title on tablet */
-	hgroup {
-		h1 {
-			font-size: 10rem;
-		}
+	hgroup h1 {
+		font-size: 10rem;
 	}
 
-	/* More breathing room on the sides */
 	footer {
 		margin-left: 2rem;
 		margin-right: 2rem;
 	}
 }
 
-/* DESKTOP: 3 per row */
 @media (width > 1200px) {
 	body {
 		font-size: 1.5rem;
-		font-kerning: normal; /* fine-tunes letter spacing for large text */
+		font-kerning: normal;
 	}
 
-	/* Switch from 2 columns to 3 columns */
-	.blocks {
-		ul {
-			grid-template-columns: repeat(3, 1fr);
+	hgroup h1 {
+		font-size: 18rem;
+	}
+
+	.text-block .text-content {
+		padding: 2.5rem;
+
+		p {
+			font-size: 1.2rem;
+			line-height: 2rem;
 		}
 	}
+}
 
-	/* Very large title on desktop */
-	hgroup {
-		h1 {
-			font-size: 18rem;
-		}
+/* =
+	 ======================================================================= */
+
+/* --- NAV: show ONE system at a time --- */
+#navigation .filter-buttons {
+	display: flex;
+	justify-content: space-between;
+	gap: 2rem;
+}
+
+#navigation #filter-select {
+	display: none;
+	width: 100%;
+}
+
+/* Mobile: hide buttons, show custom dropdown */
+@media (max-width: 768px) {
+	#navigation .filter-buttons {
+		display: none !important;
 	}
 
-	footer {
-		font-size: 1.5rem;
+	#navigation #filter-select {
+		display: block !important;
+	}
+}
+
+/* Desktop: show buttons, hide custom dropdown */
+@media (min-width: 769px) {
+	#navigation .filter-buttons {
+		display: flex !important;
 	}
 
-	/* Larger heading in the About section on desktop */
-	.about {
-		h2 {
-			font-size: 5rem;
-		}
+	#navigation #filter-select {
+		display: none !important;
 	}
+}
 
-	/* More horizontal padding in the nav on wide screens */
-	#navigation {
-		padding-left: 2rem;
-		padding-right: 2rem;
-	}
+/* Custom dropdown: open state */
+#filter-options {
+	display: none;
+}
+
+#filter-select.is-open #filter-options {
+	display: block;
+}
+
+#filter-options li.is-selected {
+	background: var(--background);
+	color: var(--text);
 }
