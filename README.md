@@ -1,4 +1,4 @@
-# Raise Your Glass! 🍸  
+# Project 4: Links  
 **An Are.na-powered collection site exploring glassware through images, videos, text, links, and audio.**
 
 This project was developed as part of the **2025–26 MPS Communication Design** program at **Parsons School of Design**.
