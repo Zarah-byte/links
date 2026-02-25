@@ -14,7 +14,9 @@ This project was developed as part of the **2025–26 MPS Communication Design**
 
 ## About the Project
 
-**Raise Your Glass!** is a front-end site that pulls content from an Are.na channel and displays it as a bold, responsive grid. The collection brings together research and visual inspiration around glassware—its history, techniques, and material presence—while keeping the interface playful and interaction-forward.
+**Raise Your Glass!** is a front-end site that pulls content from an Are.na channel and displays it as a bold, responsive grid. The collection brings together research and visual inspiration around glassware—its history, techniques, and material presence—while keeping the interface playful and interaction-forward. 
+
+In terms if design I was heavily insipred by waht we do with glassware, paticulrly that that is fancy, well we make drinks in them, this led me to cocktail cards (recepie cards for cocktails). creating a sense of celebration and joy around the craft of glassmaking/glassware byond jst the technical craft but the art and community it leads to. 
 
 Instead of hardcoding content, the site fetches blocks live from Are.na, so the collection can evolve continuously as the channel updates.
 
