@@ -23,7 +23,7 @@ Instead of hardcoding content, the site fetches blocks live from Are.na, so the 
 ## Key Features
 
 ### Note on ChatGPT Use (Learning + Debugging Support)
-ChatGPT was used as a learning and troubleshooting partner throughout this project. I used it to help me **diagnose bugs**, **trace why certain behaviors weren’t working (especially in JavaScript)**, and to **translate JS concepts into beginner-friendly explanations** so I could understand what each function was doing. Any suggestions I used were **tested, edited, and integrated by me**, and the goal was always to strengthen my understanding of vanilla JavaScript—not to copy/paste without comprehension. (disclaimer i did get project blindness in the middle but pivitoed to understading which is why the website ended up as it is)
+ChatGPT was used as a learning and troubleshooting partner throughout this project. I used it to help me diagnose bugs, trace why certain behaviors weren’t working (especially in JavaScript), and to translate JS concepts into beginner-friendly explanations** so I could understand what each function was doing (these were paticularly useful wwhen the sorting and the intersection observer was misbehaving). Any suggestions I used were tested, edited, and integrated by me. (disclaimer I did get project blindness in the middle but pivitoed to understading which is why the website ended up as it is)
 
 ### 1) Are.na API → Live, data-driven content
 - Pulls channel details + block content directly from Are.na.
