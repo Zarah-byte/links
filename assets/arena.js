@@ -23,6 +23,7 @@ let currentFilter = DEFAULT_FILTER
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // MOBILE-ONLY “HOVER” HIGHLIGHT (IntersectionObserver)
 // This was suggested + explained to me by Riya — I’m using it to fake hover on mobile.
+//https://typography-interaction-2526.github.io/topic/javascript/#watching-for-scrolling
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //
 // On desktop, I already get real :hover styles.
