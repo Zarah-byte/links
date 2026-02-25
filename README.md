@@ -85,7 +85,7 @@ Mobile doesn’t have real hover states, so the project uses an **IntersectionOb
 ---
 
 ## Typographic Licences
-# Syne
+### Syne
 Designed by Bonjour Monde, Lucas Descroix, George Triantafyllakos
 
 License
@@ -94,7 +94,7 @@ This Font Software is licensed under the SIL Open Font License, Version 1.1 . Th
 
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
 
-# Bokor
+### Bokor
 Designed by Danh Hong
 
 License
