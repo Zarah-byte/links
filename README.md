@@ -1,118 +1,82 @@
-# Project 4: Links  
-**An Are.na-powered collection site exploring glassware through images, videos, text, links, and audio.**
+# Mix a Drink!
 
-This project was developed as part of the **2025–26 MPS Communication Design** program at **Parsons School of Design**.
+A card-deck website that pulls a live [Are.na](https://www.are.na/katie-lu/glassware-rxfrlfenjcu) channel about glassware and deals it out like a hand of cocktail cards. The collection brings together research and visual inspiration around glassware (its history, techniques and material presence) while keeping the interface playful and interaction-forward.
 
----
+Built for the "Links" project in [Typography & Interaction](https://typography-interaction-2526.github.io/), 2025–26 MPS Communication Design, Parsons School of Design.
 
-## Live Links
+- **Project brief:** https://typography-interaction-2526.github.io/project/4/
+- **Are.na channel:** [Glassware](https://www.are.na/katie-lu/glassware-rxfrlfenjcu)
 
-- **Project (course page):** https://typography-interaction-2526.github.io/project/4/
-- **Are.na channel:** https://www.are.na/katie-lu/glassware-rxfrlfenjcu
+## About the design
 
----
+In terms of design, I was heavily inspired by what we do with glassware, particularly the fancy kind: we make drinks in it. That led me to cocktail cards (recipe cards for cocktails), creating a sense of celebration and joy around glassmaking and glassware, beyond just the technical craft, to the art and community it leads to.
 
-## About the Project
+## Features
 
-**Raise Your Glass!** is a front-end site that pulls content from an Are.na channel and displays it as a bold, responsive grid. The collection brings together research and visual inspiration around glassware—its history, techniques, and material presence—while keeping the interface playful and interaction-forward. 
+- **A hand of five.** Every visit deals five random blocks into a fan of cards. On phones the fan becomes a deck you swipe through. **Shuffle** deals a new hand.
+- **See all.** The fan straightens into a scrolling row of every block, in the order it was added (#1 → #146), with arrows and a counter. **Back to hand** returns to the same five.
+- **Flip cards.** Clicking a card opens it large, with the page behind blurred. The front shows the media: the image, video, text or the first page of a PDF. **Flip** shows the back: name, number, ingredients, source and a link to Are.na.
+- **Live content.** Nothing is hardcoded. Blocks load from the Are.na API, including every page of a long channel, so the site grows as the channel does.
 
-In terms if design I was heavily insipred by waht we do with glassware, paticulrly that that is fancy, well we make drinks in them, this led me to cocktail cards (recepie cards for cocktails). creating a sense of celebration and joy around the craft of glassmaking/glassware byond jst the technical craft but the art and community it leads to. 
+### Tagging blocks with ingredients
 
-Instead of hardcoding content, the site fetches blocks live from Are.na, so the collection can evolve continuously as the channel updates.
+Add hashtags to a block's description on Are.na, e.g. `Lovely coupe #coupe #gin`. The card shows `coupe` and `gin` as ingredients, after the media type.
 
----
+## Running it locally
 
-## Key Features
+Plain HTML, CSS and JavaScript, with no build step. 
 
-### Note on ChatGPT Use (Learning + Debugging Support)
-ChatGPT was used as a learning and troubleshooting partner throughout this project. I used it to help me diagnose bugs, trace why certain behaviors weren’t working (especially in JavaScript), and to translate JS concepts into beginner-friendly explanations so I could understand what each function was doing (these were paticularly useful wwhen the sorting and the intersection observer was misbehaving). Any suggestions I used were tested, edited, and integrated by me. (disclaimer I did get project blindness in the middle but pivitoed to understading which is why the website ended up as it is)
+## Project structure
 
-### 1) Are.na API → Live, data-driven content
-- Pulls channel details + block content directly from Are.na.
-- Handles pagination so the full channel loads (not just the first page).
+| File | What's in it |
+|---|---|
+| `index.html` | Header, the card hero and the About popup |
+| `assets/arena.js` | Fetches the channel; builds the cards, Shuffle, See all, the phone swipe deck and the flip-card view |
+| `assets/style.css` | All styles; design tokens (colours, type scale, card sizes) are at the top |
+| `assets/reset.css` | The course's CSS reset |
+| `assets/*-cover.*`, `assets/text.svg` | Illustrated covers for link, audio, video and text/PDF blocks |
+| `assets/fonts/` | Bonbance Bold Condensed |
+| `assets/favicons/` | `favicon.ico` (16, 32 and 64px) |
 
-### 2) Category filtering (with a default state)
-Filters are mapped to the content types the site renders:
+To show a different Are.na channel, change `channelSlug` at the top of `assets/arena.js`.
 
-| UI Label | Filter value | What shows |
-|---|---|---|
-| **LOOK** | `image` | Image blocks |
-| **WATCH** | `attachment` | Video attachments + embed blocks |
-| **READ** | `text` | Text blocks + PDF attachments (shown as previews in the grid) |
-| **EXPLORE** | `links` | Link blocks |
-| **LISTEN** | `audio` | Audio attachments |
-
-✅ The site defaults to **LOOK (images)** on load, so the first view is immediate and visually strong.
-
-### 3) Responsive navigation: desktop buttons + mobile custom dropdown
-- Desktop: button row
-- Mobile: custom dropdown UI (only one system visible at a time)
-
-### 4) Reusable modal built with native `<dialog>`
-- Clicking a card opens a modal with:
-  - Title + description
-  - “See original” (source link when available)
-  - “See on Are.na”
-  - Media preview (supported types listed below)
-
-### 5) Media handling (grid + modal)
-**Grid supports:**
-- Images (cropped to fill)
-- Link blocks (image previews)
-- Text blocks (clean typographic tile)
-- Video attachments + Embeds (thumbnail preview or fallback tile)
-- PDF attachments (thumbnail preview or fallback tile)
-- Audio attachments (stylized tile)
-
-**Modal currently previews:**
-- Images + Link preview images
-- Embeds (iframe)
-- Video attachments (native `<video controls>`)
-
-Other attachments may show a “No preview available” placeholder in the modal (depending on file type).
-
-### 6) Mobile-only “hover” highlight
-Mobile doesn’t have real hover states, so the project uses an **IntersectionObserver** to add/remove a `.highlight` class as cards enter an “active zone” while scrolling. Desktop keeps true `:hover`. using intersection observer (Thanks Riya!) 
-
----
-
-## Tech Stack
+## Tech stack
 
 - **HTML**
-- **CSS** (design tokens + responsive layout)
-- **Vanilla JavaScript**
+- **CSS** (design tokens, a consistent type scale, responsive layout)
+- **Vanilla JavaScript** (View Transitions for the fan → row morph)
 - **Are.na API**
-- **Typography:** Google Fonts (**Syne** + **Bokor**)
+- **Typography:** Bonbance (self-hosted), DM Sans and DM Mono (Google Fonts)
 
----
+## Authors
 
-## Typographic Licences
-### Syne
-Designed by Bonjour Monde, Lucas Descroix, George Triantafyllakos
+- [Zarah Yaqub](https://github.com/Zarah-byte)
+- [Katie Lu](https://github.com/luk862-glitch)
 
-License
-Copyright 2017 The Syne Project Authors (https://gitlab.com/bonjour-monde/fonderie/syne-typeface)
-This Font Software is licensed under the SIL Open Font License, Version 1.1 . This license is copied below, and is also available with a FAQ at: https://openfontlicense.org
+## Note on AI use
 
-SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+### Claude (redesign and implementation)
 
-### Bokor
-Designed by Danh Hong
+The redesign from a filterable grid into the card deck was built with Claude (Anthropic's Claude Code) as a coding assistant. I led the design with my own mockups and direction — the card fan, the flip-card view, See all, the covers, the type and icon choices — and Claude wrote and refactored the HTML, CSS and JavaScript to match, checked the layout at different screen sizes, and reformatted the code to follow the conventions from my earlier project. I reviewed each change in the browser and asked for revisions where it didn't match what I wanted.
 
-License
-Copyright 2020 The Bokor Project Authors (https://github.com/danhhong/Bokor)
-This Font Software is licensed under the SIL Open Font License, Version 1.1 . This license is copied below, and is also available with a FAQ at: https://openfontlicense.org
+### ChatGPT (learning and debugging support)
 
-SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+ChatGPT was used as a learning and troubleshooting partner throughout this project. I used it to help me diagnose bugs, trace why certain behaviours weren't working (especially in JavaScript), and translate JS concepts into beginner-friendly explanations so I could understand what each function was doing (these were particularly useful when the sorting and the intersection observer were misbehaving). Any suggestions I used were tested, edited and integrated by me. (Disclaimer: I did get project blindness in the middle, but pivoted to understanding, which is why the website ended up as it is.)
 
----
+## License
 
-## Project Structure
+The site's code is [MIT](https://choosealicense.com/licenses/mit/) licensed.
 
-```txt
-.
-├── index.html
-├── reset.css
-└── assets/
-    ├── style.css
-    └── arena.js
+### Font and icon licenses
+
+The fonts and icons have their own licenses:
+
+| Asset | Designer / Publisher | License | Used for |
+|---|---|---|---|
+| [Bonbance Bold Condensed](https://atypeofamigo.com/fonts/bonbance/) | Louna Bourdon, published by X Cicéro | [SIL Open Font License 1.1](https://openfontlicense.org) | Titles (self-hosted in `assets/fonts/`) |
+| [DM Sans](https://fonts.google.com/specimen/DM+Sans) | Colophon Foundry, for Google Fonts | [SIL Open Font License 1.1](https://openfontlicense.org) | Body text (loaded from Google Fonts) |
+| [DM Mono](https://fonts.google.com/specimen/DM+Mono) | Colophon Foundry, for Google Fonts | [SIL Open Font License 1.1](https://openfontlicense.org) | Buttons and labels (loaded from Google Fonts) |
+| [Lucide](https://lucide.dev) icons | Lucide contributors | [ISC License](https://lucide.dev/license) | Button icons (martini, shuffle, flip, arrows, close) |
+| [Material Symbols](https://fonts.google.com/icons) "info" icon | Google | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) | The ⓘ button in the header |
+
+Under the OFL, fonts can be used, embedded and redistributed (including commercially), but not sold on their own; the license text travels with the font files.

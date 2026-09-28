@@ -1,1054 +1,616 @@
-// ALl LLM Attibutions to Chat-GPT
+// All LLM attributions to ChatGPT
 
-// STEP 1 — CONFIG
-// Here I’m setting the key “settings” for the project in one place.
-// `channelSlug` is the exact Are.na channel I want the site to pull content from (my Glassware channel).
-// `myUsername` is my Are.na username, which I use for attribution / links back to my profile.
-// I’m using `const` because these values should stay fixed and not change while the site runs.
-const channelSlug = 'glassware-rxfrlfenjcu'
-const myUsername = 'zarah-yaqub'
+// Config: the Are.na channel and the cover images.
+const channelSlug = "glassware-rxfrlfenjcu";
 
-// FILTERING STATE
-// This section is basically the “brain” of my filter system.
-// I’m setting a default view (images) so the page loads with the image content showing first,
-// and then I track whatever filter the user clicks after that.
+// Covers stand in for media in the fan; the real thing shows on the big card.
+const LINK_COVER = "assets/links-cover.svg";
+const AUDIO_COVER = "assets/audio-cover.png";
+const VIDEO_COVER = "assets/video-cover.svg"; // uploaded videos and YouTube/Vimeo embeds
+const TEXT_COVER = "assets/text.svg"; // text blocks and PDFs
 
-// Default filter = images (so “Look” / images is the starting state on load)
-const DEFAULT_FILTER = 'image'
+// Card view: the big, flippable card, built once as a native <dialog>.
+// Front shows the media; Flip shows the back (name, number, ingredients, source, Are.na link).
 
-// This is the filter that’s currently active.
-// I’m using `let` because this value needs to update every time the user switches categories.
-let currentFilter = DEFAULT_FILTER
+// Lucide icons: repeat, x, arrows and ↗.
+const ICON_FLIP =
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>';
+const ICON_EXIT =
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+const ICON_PREV =
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>';
+const ICON_NEXT =
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+const ICON_ARROW =
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>';
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// MOBILE-ONLY “HOVER” HIGHLIGHT (IntersectionObserver)
-// This was suggested + explained to me by Riya — I’m using it to fake hover on mobile.
-//https://typography-interaction-2526.github.io/topic/javascript/#watching-for-scrolling
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//
-// On desktop, I already get real :hover styles.
-// But on mobile there’s no hover, so I simulate that “active card” feeling by
-// adding/removing a `.highlight` class when a card scrolls into a centered zone.
-//
-// Key idea: ONLY run this on mobile / touch devices so desktop never gets weird/stuck.
-
-let cardObserver = null
-// I keep a media query handy so I can quickly tell when we’re in a “mobile width” layout.
-const mqMobileHighlight = window.matchMedia('(max-width: 768px)')
-
-// Decide if I should turn this feature on.
-// I treat it as “mobile mode” if:
-// - the screen is <= 768px wide, OR
-// - the device doesn’t support hover and has a coarse pointer (aka most phones/tablets).
-function isMobileHighlightMode() {
-	return (
-		mqMobileHighlight.matches ||
-		window.matchMedia('(hover: none) and (pointer: coarse)').matches
-	)
-}
-
-// Create ONE IntersectionObserver that will watch ALL the cards.
-// This is cleaner + faster than making a separate observer per card.
-function buildCardObserver() {
-	return new IntersectionObserver(
-		(entries) => {
-			// The observer gives me a list of cards whose visibility changed.
-			entries.forEach((entry) => {
-				// If the card is inside the “active zone”, add `.highlight`.
-				// If it leaves that zone, remove `.highlight`.
-				entry.target.classList.toggle('highlight', entry.isIntersecting)
-			})
-		},
-		{
-			root: null,                     // null = use the viewport as the “root”
-			// Shrink the top + bottom so the “active zone” becomes the middle strip of the screen.
-			// That way a card highlights when it’s roughly centered (more mobile-friendly).
-			rootMargin: '-35% 0px -35% 0px',
-			threshold: 0                   // trigger as soon as it touches the zone at all
-		}
-	)
-}
-
-// Reconnect the observer to ONLY the cards that are currently visible.
-// (Important because my filters hide cards with display:none — no point observing those.)
-function refreshObserverTargets() {
-	if (!cardObserver) return
-
-	// First: stop observing everything so I can rebuild the list cleanly.
-	cardObserver.disconnect()
-
-	// Then: loop through all cards in the grid…
-	document.querySelectorAll('#channel-blocks > li').forEach((li) => {
-		// …and only observe the ones that are actually showing.
-		if (li.style.display !== 'none') cardObserver.observe(li)
-	})
-}
-
-// Turn ON the mobile highlight feature.
-// If it’s already on, I don’t recreate it.
-function enableMobileHighlights() {
-	if (cardObserver) return
-	cardObserver = buildCardObserver()
-	refreshObserverTargets()
-}
-
-// Turn OFF the mobile highlight feature (and clean up).
-function disableMobileHighlights() {
-	if (!cardObserver) return
-
-	// Stop watching everything and fully remove the observer.
-	cardObserver.disconnect()
-	cardObserver = null
-
-	// Also remove any leftover `.highlight` classes so desktop never looks “stuck”.
-	document.querySelectorAll('#channel-blocks > li.highlight').forEach((li) => {
-		li.classList.remove('highlight')
-	})
-}
-
-// Keep the feature correctly enabled/disabled if the screen size changes
-// (like rotating the phone or resizing the browser).
-function syncHighlightMode() {
-	if (isMobileHighlightMode()) enableMobileHighlights()
-	else disableMobileHighlights()
-}
-
-// Listen for breakpoint changes + resize/rotation, and re-sync the mode.
-// Optional chaining on addEventListener is just a safety check in case the browser
-// doesn’t support it on MediaQueryList (older browsers).
-mqMobileHighlight.addEventListener?.('change', syncHighlightMode)
-window.addEventListener('resize', syncHighlightMode)
-window.addEventListener('orientationchange', syncHighlightMode)
-
-
-// This function applies the filter by showing/hiding cards in the grid.
-// If no filter is passed in, it just uses whatever the current filter already is.
-function applyFilter(filter = currentFilter) {
-
-	// Update the global filter state.
-	// If something weird/empty gets passed in, I fall back to "all".
-	// I also force lowercase so the comparison is consistent.
-	currentFilter = (filter || 'all').toLowerCase()
-
-	// Grab every card (<li>) inside #channel-blocks and loop through them one by one.
-	document.querySelectorAll('#channel-blocks > li').forEach((li) => {
-
-		// Each card has a `data-type` attribute (like image / video / text).
-		// I read that value so I know what category the card belongs to.
-		const type = (li.dataset.type || '').toLowerCase()
-
-		// Decide if this card should be visible:
-		// - show everything if the filter is "all"
-		// - otherwise only show cards whose type matches the selected filter
-		const show = currentFilter === 'all' || currentFilter === type
-
-		// Actually show/hide the card by toggling its display style.
-		// '' means “use the default CSS” (visible), and 'none' means hidden.
-		li.style.display = show ? '' : 'none'
-
-		// If a card gets hidden, remove highlight so it doesn't “stick” when you switch filters
-		if (!show) li.classList.remove('highlight')
-	})
-
-	// If mobile highlights are enabled, re-sync the observer to the visible cards
-	refreshObserverTargets()
-}
-// STEP 2 — BUILD THE MODAL <dialog>
-// This is where I build the modal once, up front, using the native HTML <dialog> element.
-// Instead of having a bunch of modal HTML sitting in my index.html, I generate it in JavaScript,
-// so it’s always consistent and easy to update in one place.
-
-// Create a brand new <dialog> element (this is the actual modal container)
-const dialog = document.createElement('dialog')
-
-// Give it an ID so I can target it in CSS (for styling + layout)
-dialog.id = 'dialog'
-
-// Inject the entire modal structure as HTML using a template string.
-// This layout includes:
-// - a close button (with an X icon)
-// - a meta panel (title + description)
-// - action links (source link + Are.na link)
-// - an empty media container where I’ll dynamically insert the image/video/etc. later
+const dialog = document.createElement("dialog");
+dialog.id = "dialog";
+dialog.setAttribute("aria-label", "Selected card");
 dialog.innerHTML = `
-	<button class="dialog-close">
-		<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
-			<path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
-		</svg>
-	</button>
-	<div class="dialog-meta">
-		<div class="dialog-card-header">
-			<h3 class="dialog-title"></h3>
+	<div class="card-stage">
+	<button class="pill-button btn-step btn-card-prev" type="button" aria-label="Previous card">${ICON_PREV}</button>
+	<div class="flip-card">
+		<div class="card-face card-front"></div>
+		<div class="card-face card-back">
+			<div class="card-back-header">
+				<h2 class="card-name"></h2>
+				<span class="card-number"></span>
+			</div>
+			<section class="card-ingredients">
+				<h3>Ingredients</h3>
+				<ul class="card-tags"></ul>
+			</section>
+			<section class="card-source">
+				<h3>Source</h3>
+				<p class="card-source-text"></p>
+			</section>
+			<a class="card-arena-link" target="_blank" rel="noopener noreferrer">See on Are.na ${ICON_ARROW}</a>
 		</div>
-		<p class="dialog-description"></p>
-		<section class="dialog-actions">
-			<a class="dialog-source" target="_blank" rel="noopener noreferrer">See original ↗&#xFE0E;</a>
-			<a class="dialog-arena-link" target="_blank" rel="noopener noreferrer">See on Are.na ↗&#xFE0E;</a>
-		</section>
 	</div>
-	<div class="dialog-media"></div>
-`
+	<button class="pill-button btn-step btn-card-next" type="button" aria-label="Next card">${ICON_NEXT}</button>
+	</div>
+	<div class="card-actions">
+		<button class="pill-button btn-flip" type="button">Flip ${ICON_FLIP}</button>
+		<button class="pill-button btn-exit" type="button">Exit ${ICON_EXIT}</button>
+	</div>
+`;
+document.body.appendChild(dialog);
 
-// Finally, I attach the dialog to the <body> so it actually exists on the page
-// and can be opened/closed later when a user clicks a card.
-document.body.appendChild(dialog)
+// Card view parts, looked up once.
+const cardFront = dialog.querySelector(".card-front");
+const cardBack = dialog.querySelector(".card-back");
+const cardName = dialog.querySelector(".card-name");
+const cardNumber = dialog.querySelector(".card-number");
+const cardTags = dialog.querySelector(".card-tags");
+const cardSource = dialog.querySelector(".card-source");
+const cardSourceText = dialog.querySelector(".card-source-text");
+const cardArenaLink = dialog.querySelector(".card-arena-link");
 
-// STEP 3 — CACHED REFERENCES TO DIALOG PARTS
-// After building the modal, I “cache” (save) the important elements inside it.
-// This means I don’t have to keep re-running `querySelector` every time the modal opens,
-// and I can update the title / description / links / media quickly and cleanly.
-
-// Where the main media (image / video / etc.) gets injected
-const dialogMedia = dialog.querySelector('.dialog-media')
-
-// The close button (X) so I can attach click + keyboard behavior
-const dialogClose = dialog.querySelector('.dialog-close')
-
-// The text/info panel in the modal (title, description, links)
-const dialogMeta = dialog.querySelector('.dialog-meta')
-
-// The title element that I fill in dynamically per block
-const dialogTitle = dialog.querySelector('.dialog-title')
-
-// The description text that I fill in dynamically per block
-const dialogDescription = dialog.querySelector('.dialog-description')
-
-// Link to the original source (if the Are.na block has a source URL)
-const dialogSource = dialog.querySelector('.dialog-source')
-
-// Link back to the block on Are.na (so users can view it in context)
-const dialogArenaLink = dialog.querySelector('.dialog-arena-link')
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STEP 4 — HELPER FUNCTIONS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//
-// This whole section is my “toolkit” for the project.
-// Everything here is used later by the grid + modal logic so I don’t repeat myself.
-
-//escapeHtml(s)
-// I use this when I’m about to inject text into HTML (ex: inside `innerHTML`).
-// It replaces risky characters so the browser treats them as text, not as real HTML.
+// Makes text safe to put inside innerHTML (& first, so it isn't escaped twice).
 function escapeHtml(s) {
-	// `String(s)` makes sure whatever comes in (null/number/etc.) becomes a string safely
-	return String(s)
-		// Replace & first (because if you replace < first, you could create new & sequences)
-		.replace(/&/g, '&amp;')   // turns "&" into "&amp;"
-		.replace(/</g, '&lt;')    // turns "<" into "&lt;"
-		.replace(/"/g, '&quot;')  // turns `"` into "&quot;"
+	return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 }
 
-// getBestSourceUrl(blockData)
-// Are.na blocks can store the “original URL” in different places depending on block type.
-// This helper checks the likely spots in priority order and returns the first real URL it finds.
-function getBestSourceUrl(blockData) {
-	return (
-		// For Link blocks, Are.na often stores the original link here:
-		blockData?.source?.url ||
-
-		// For file uploads (Attachments), the direct file URL lives here:
-		blockData?.attachment?.url ||
-
-		// For Image blocks, the highest-quality original can be here:
-		blockData?.image?.original?.url ||
-
-		// Sometimes images come with `src` instead of `url`:
-		blockData?.image?.src ||
-
-		// If none of those exist, return an empty string so the caller can handle “no source”
-		''
-	)
-}
-
-// getPdfOrVideoThumb(blockData)
-// This is for getting a *static preview image* to show in the grid for non-image media.
-// It checks common preview image sizes Are.na provides (large/display/thumb).
+// Best preview image Are.na made for a PDF or video, largest first.
 function getPdfOrVideoThumb(blockData) {
 	return (
-		// Highest-quality “large” image if available:
 		blockData?.image?.large?.url ||
 		blockData?.image?.large?.src_2x ||
 		blockData?.image?.large?.src ||
-
-		// “display” size preview:
 		blockData?.image?.display?.url ||
 		blockData?.image?.display?.src ||
-
-		// Smallest fallback thumbnail:
 		blockData?.image?.thumb?.url ||
 		blockData?.image?.thumb?.src ||
-
-		// If no preview image exists, return empty string
-		''
-	)
+		""
+	);
 }
 
-// makeMetaRow(label, valueHTML)
-// This builds one clean “row” of metadata inside the modal (like Added By / Added Date / Source).
-// It returns a string of HTML that I append into the `.dialog-extra-meta` container.
-function makeMetaRow(label, valueHTML) {
-	return `
-		<div class="dialog-meta-row">
-			<!-- Left label text like "Added By" -->
-			<span class="dialog-section-label">${label}</span>
-
-			<!-- Middle dotted/line leader for styling -->
-			<span class="dialog-meta-leader"></span>
-
-			<!-- Right value (can contain HTML like links) -->
-			<span class="dialog-meta-value">${valueHTML}</span>
-		</div>
-	`
-}
-
-// buildModalMedia(blockData)
-// This decides what media element should go inside the modal based on Are.na block type.
-// Returns:
-// - `frame` → a DIV containing the media element (img/video/embed/etc.)
-// - `modalKind` → a label like "image", "video", "embed" so CSS can style by type
+// Front of the big card: the real media for a block.
+// modalKind "other"/"attachment" means there's nothing to show, so openModal copies the small card instead.
 function buildModalMedia(blockData) {
-	// Create a wrapper div to hold whatever media we generate
-	const frame = document.createElement('div')
+	const frame = document.createElement("div");
+	frame.className = "media-frame";
+	let modalKind = "other";
 
-	// This class is referenced by my CSS to size/crop the modal media consistently
-	frame.className = 'media-frame'
-
-	// Default label (used if we can’t categorize it)
-	let modalKind = 'other'
-
-	// ── CASE 1: Image blocks or Link blocks
-	// Link blocks can still have a preview image provided by Are.na
-	if (blockData.type === 'Image' || blockData.type === 'Link') {
-		// This becomes "image" or "link" and is later set on dialog.dataset.modalKind
-		modalKind = blockData.type.toLowerCase()
-
-		// Create the actual <img> element
-		const img = document.createElement('img')
-
-		// `media-fill` is referenced in CSS to make the media fill the frame nicely
-		img.className = 'media-fill'
-
-		// Pick the best image URL based on whether it’s a real Image vs a Link preview image
-		img.src = blockData.type === 'Image'
-			// Image blocks: prefer high-res large src_2x, fallback to image.src
-			? (blockData.image?.large?.src_2x || blockData.image?.src || '')
-			// Link blocks: prefer preview images (large src_2x then medium src_2x)
-			: (blockData.image?.large?.src_2x || blockData.image?.medium?.src_2x || '')
-
-		// Alt text for accessibility (if Are.na provided it)
-		img.alt = blockData.image?.alt_text || ''
-
-		// Lazy-load so images load only when needed
-		img.loading = 'lazy'
-
-		// Put the image inside the wrapper
-		frame.appendChild(img)
-
-		// ── CASE 2: Embed blocks (ex: YouTube / Vimeo / other iframe embeds)
-	} else if (blockData.type === 'Embed' && blockData.embed?.html) {
-		// Label for CSS
-		modalKind = 'embed'
-
-		// Extra wrapper class used by CSS (usually for iframe scaling)
-		frame.classList.add('embed-wrapper')
-
-		// Inject Are.na-provided embed HTML (usually an iframe)
-		frame.innerHTML = blockData.embed.html
-
-		// Normalize any iframe/video inside the embed so CSS controls the size, not hardcoded attributes
-		frame.querySelectorAll('iframe, video').forEach((el) => {
-			// `media-fill` is referenced by CSS to fill/crop in the modal
-			el.classList.add('media-fill')
-
-			// Remove fixed dimensions so the iframe/video can be responsive
-			el.removeAttribute('width')
-			el.removeAttribute('height')
-		})
-
-		// ── CASE 3: Attachment blocks (file uploads hosted by Are.na)
-	} else if (blockData.type === 'Attachment') {
-		// Are.na stores the file’s MIME type here (ex: "video/mp4", "application/pdf")
-		const ct = blockData.attachment?.content_type || ''
-
-		// CASE 3A: Video attachments
-		if (ct.includes('video') && blockData.attachment?.url) {
-			modalKind = 'video'
-
-			// Create native HTML <video> element (so users can play it)
-			const video = document.createElement('video')
-
-			// CSS hook to fill the frame
-			video.className = 'media-fill'
-
-			// Show the player controls (play/pause/volume)
-			video.controls = true
-
-			// Load basic metadata early (duration + dimensions) so layout is smoother
-			video.preload = 'metadata'
-
-			// Keeps iPhones from forcing fullscreen playback
-			video.playsInline = true
-
-			// Direct video file URL from Are.na (attachment.url)
-			video.src = blockData.attachment.url
-
-			// Add video into the wrapper
-			frame.appendChild(video)
-
-			// CASE 3B: Non-video attachments → placeholder message
+	// Images, and links (which always use the links cover).
+	if (blockData.type === "Image" || blockData.type === "Link") {
+		modalKind = blockData.type.toLowerCase();
+		const img = document.createElement("img");
+		img.className = "media-fill";
+		if (blockData.type === "Image") {
+			img.src = blockData.image?.large?.src_2x || blockData.image?.src || "";
+			img.alt = blockData.image?.alt_text || "";
 		} else {
-			modalKind = 'attachment'
+			img.src = LINK_COVER;
+			img.alt = blockData.title || "Link";
+		}
+		img.loading = "lazy";
+		frame.appendChild(img);
 
-			// Create a message element
-			const msg = document.createElement('div')
+		// Embeds (YouTube, Vimeo…): drop their fixed size so CSS can fill the card.
+	} else if (blockData.type === "Embed" && blockData.embed?.html) {
+		modalKind = "embed";
+		frame.classList.add("embed-wrapper");
+		frame.innerHTML = blockData.embed.html;
+		frame.querySelectorAll("iframe, video").forEach((el) => {
+			el.classList.add("media-fill");
+			el.removeAttribute("width");
+			el.removeAttribute("height");
+		});
 
-			// CSS hook for placeholder styling
-			msg.className = 'media-placeholder'
+		// Text: the words themselves (textContent, so typed HTML shows as plain text).
+	} else if (blockData.type === "Text") {
+		modalKind = "text";
+		frame.classList.add("text-block");
+		frame.innerHTML = '<div class="text-content"><p></p></div>';
+		frame.querySelector("p").textContent = blockData.content?.plain || "";
+	} else if (blockData.type === "Attachment") {
+		const ct = blockData.attachment?.content_type || "";
 
-			// Visible text message
-			msg.textContent = 'No preview available for this file.'
+		// PDFs: the first page, if Are.na made an image of it.
+		if (ct.includes("pdf") && getPdfOrVideoThumb(blockData)) {
+			modalKind = "pdf";
+			const page = document.createElement("img");
+			page.className = "media-fill";
+			page.src = getPdfOrVideoThumb(blockData);
+			page.alt = blockData.title || "PDF";
+			frame.appendChild(page);
 
-			// Add placeholder into the wrapper
-			frame.appendChild(msg)
+			// Videos: a native player (playsInline stops iPhones forcing fullscreen).
+		} else if (ct.includes("video") && blockData.attachment?.url) {
+			modalKind = "video";
+			const video = document.createElement("video");
+			video.className = "media-fill";
+			video.controls = true;
+			video.preload = "metadata";
+			video.playsInline = true;
+			video.src = blockData.attachment.url;
+			frame.appendChild(video);
+		} else {
+			modalKind = "attachment";
+			const msg = document.createElement("div");
+			msg.className = "media-placeholder";
+			msg.textContent = "No preview available for this file.";
+			frame.appendChild(msg);
 		}
 	}
 
-	// FINAL SAFETY: If none of the above created any media, show a generic fallback message
+	// Nothing matched: say so rather than show an empty card.
 	if (!frame.childNodes.length) {
-		const msg = document.createElement('div')
-		msg.className = 'media-placeholder'
-		msg.textContent = 'No preview available.'
-		frame.appendChild(msg)
+		const msg = document.createElement("div");
+		msg.className = "media-placeholder";
+		msg.textContent = "No preview available.";
+		frame.appendChild(msg);
 	}
 
-	// Return both the element + label so `openModal()` can use them
-	return { frame, modalKind }
+	return { frame, modalKind };
 }
 
-//  openModal(blockData)
-// This is the “full workflow” when a user clicks a card.
-// It resets old content, fills in new title/description/links, injects media, builds meta rows,
-// then opens the native <dialog>.
-function openModal(blockData) {
-	// Clear media area from the previous block
-	dialogMedia.innerHTML = ''
+// Hashtags in a block's description (#coupe #gin) are its ingredients.
+const TAG_PATTERN = /#[\p{L}\p{N}_-]+/gu;
 
-	// Reset title text
-	dialogTitle.textContent = ''
+// Names longer than this are cut off with … on the back of the card.
+const NAME_MAX = 14;
 
-	// Reset description content
-	dialogDescription.innerHTML = ''
+// Media type for the first ingredient pill; attachments are named by file type.
+function blockTypeLabel(blockData) {
+	const ct = blockData.attachment?.content_type || "";
+	if (ct.includes("video")) return "Video";
+	if (ct.includes("pdf")) return "PDF";
+	if (ct.includes("audio")) return "Audio";
+	return blockData.type || "Unknown";
+}
 
-	// Remove previous modal kind label (used by CSS)
-	delete dialog.dataset.modalKind
+// Drops a leading "source:" / "Sourced from" / "from:" (the heading already says Source).
+// A bare "from" needs a colon, so "From the 1950s…" is left alone.
+const SOURCE_LABEL = /^\s*(?:sourced?(?:\s+(?:from|form))?\s*:?|from\s*:)\s*/i;
+const URL_PATTERN = /https?:\/\/\S+/g;
 
-	// Hide source link until we confirm we actually have a valid URL
-	dialogSource.hidden = true
-	dialogSource.href = ''
+// A link to the full URL that just reads "site.com".
+function shortLink(url) {
+	const link = document.createElement("a");
+	link.href = url;
+	link.target = "_blank";
+	link.rel = "noopener noreferrer";
+	try {
+		link.textContent = new URL(url).hostname.replace(/^www\./, "");
+	} catch {
+		link.textContent = url;
+	}
+	return link;
+}
 
-	// Always set the Are.na link using the block’s ID (Are.na uses /block/:id)
-	dialogArenaLink.href = `https://www.are.na/block/${blockData.id}`
+// Text with any pasted URLs swapped for short links.
+function withShortLinks(text) {
+	const parts = [];
+	let last = 0;
+	for (const match of text.matchAll(URL_PATTERN)) {
+		parts.push(text.slice(last, match.index), shortLink(match[0]));
+		last = match.index + match[0].length;
+	}
+	parts.push(text.slice(last));
+	return parts;
+}
 
-	// Remove extra meta rows from the last modal open (if they exist)
-	dialog.querySelector('.dialog-extra-meta')?.remove()
+// Turns the big card over; the hidden face is inert so Tab can't reach it.
+function showSide(side) {
+	const isBack = side === "back";
+	dialog.classList.toggle("is-flipped", isBack);
+	cardFront.inert = isBack;
+	cardBack.inert = !isBack;
+}
 
-	// Set title — fallback so the modal never shows blank
-	dialogTitle.textContent = blockData.title || 'Untitled'
+// The small card currently shown big, so the arrows know where they are.
+let currentCard = null;
 
-	// If Are.na provides a formatted HTML description, inject it here
-	if (blockData.description?.html) {
-		dialogDescription.innerHTML = blockData.description.html
+// Fills both faces of the big card, then opens it front-side up.
+function openModal(blockData, cardEl) {
+	currentCard = cardEl;
+
+	// Front: the real media, or a copy of the small card (audio, a PDF with no page image).
+	const { frame, modalKind } = buildModalMedia(blockData);
+	if ((modalKind === "other" || modalKind === "attachment") && cardEl) {
+		const copy = cardEl.cloneNode(true);
+		copy.removeAttribute("tabindex");
+		copy.removeAttribute("role");
+		cardFront.replaceChildren(copy);
+	} else {
+		cardFront.replaceChildren(frame);
 	}
 
-	// Find the best possible original/source URL for this block
-	const sourceUrl = getBestSourceUrl(blockData)
+	// Back: name (full name on hover) and the order it was added to the board.
+	const name = blockData.title || "Untitled";
+	cardName.textContent = name.length > NAME_MAX ? name.slice(0, NAME_MAX).trimEnd() + "…" : name;
+	cardName.title = name;
+	cardNumber.textContent = blockData.addedNumber ? `#${blockData.addedNumber}` : "";
 
-	// If we found a real source URL, show the “See original” link
-	if (sourceUrl) {
-		dialogSource.href = sourceUrl
-		dialogSource.hidden = false
-	}
-
-	// Build the correct media frame (image/video/embed/placeholder)
-	const { frame, modalKind } = buildModalMedia(blockData)
-
-	// Store modal kind on the dialog for CSS styling like:
-	// dialog[data-modal-kind="video"] { ... }
-	dialog.dataset.modalKind = modalKind
-
-	// Inject the media into the modal
-	dialogMedia.appendChild(frame)
-
-	// Build a container for extra metadata rows (type, added by, date, source)
-	const metaDiv = document.createElement('div')
-	metaDiv.className = 'dialog-extra-meta'
-
-	// Show Media Type (uses Are.na blockData.class or blockData.type)
-	if (blockData.class || blockData.type) {
-		metaDiv.innerHTML += makeMetaRow(
-			'Media Type',
-			escapeHtml(blockData.class || blockData.type)
-		)
-	}
-
-	// Show who added it (Are.na user object: full_name / username / slug)
-	if (blockData.user?.full_name || blockData.user?.username) {
-		const name = blockData.user.full_name || blockData.user.username
-		const slug = blockData.user.slug || blockData.user.username
-
-		metaDiv.innerHTML += makeMetaRow(
-			'Added By',
-			`<a href="https://www.are.na/${escapeHtml(slug)}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a>`
-		)
-	}
-
-	// Show date added (Are.na created_at timestamp)
-	if (blockData.created_at) {
-		const date = new Date(blockData.created_at).toLocaleDateString('en-US', {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric'
+	// Ingredients: the media type, then the description's hashtags.
+	const description = blockData.description?.plain || "";
+	const tags = description.match(TAG_PATTERN) || [];
+	const pills = [blockTypeLabel(blockData).toUpperCase(), ...tags.map((tag) => tag.slice(1))];
+	cardTags.replaceChildren(
+		...pills.map((text) => {
+			const li = document.createElement("li");
+			li.textContent = text;
+			return li;
 		})
+	);
 
-		metaDiv.innerHTML += makeMetaRow('Added', escapeHtml(date))
+	// Source: the description minus hashtags and label, or else a link to the original page.
+	const about = description.replace(TAG_PATTERN, "").replace(SOURCE_LABEL, "").trim();
+	const sourceUrl = blockData.source?.url;
+	if (about) {
+		cardSourceText.replaceChildren(...withShortLinks(about));
+	} else if (sourceUrl) {
+		cardSourceText.replaceChildren(shortLink(sourceUrl));
 	}
+	cardSource.hidden = !about && !sourceUrl;
 
-	// Show a neat shortened Source link (if one exists)
-	if (sourceUrl) {
-		const display = escapeHtml(
-			// strip protocol for cleaner display (https://)
-			sourceUrl.replace(/^https?:\/\//, '').slice(0, 40) +
-			// if it’s long, add an ellipsis
-			(sourceUrl.length > 45 ? '…' : '')
-		)
+	cardArenaLink.href = `https://www.are.na/block/${blockData.id}`;
+	cardBack.scrollTop = 0;
 
-		metaDiv.innerHTML += makeMetaRow(
-			'Source',
-			`<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${display}</a>`
-		)
+	// Stepping with the arrows keeps whichever side you're on.
+	if (!dialog.open) {
+		showSide("front");
+		dialog.showModal();
 	}
-
-	// Insert the meta block right under the title header area in the modal layout
-	dialogTitle.closest('.dialog-card-header').insertAdjacentElement('afterend', metaDiv)
-
-	// Reset scroll position so the modal always opens at the top
-	dialog.scrollTop = 0
-
-	// Add a class to <body> so CSS can lock background scrolling (and style overlays if needed)
-	document.body.classList.add('modal-open')
-
-	// Open the native dialog modal
-	dialog.showModal()
 }
 
-//  makeClickable(el, blockData)
-// This turns a grid card into something that behaves like a button:
-// - mouse click opens modal
-// - keyboard Enter/Space opens modal
-// - it stays accessible (tab focus + role)
+// Shows the previous/next card, wrapping around the ends.
+function step(direction) {
+	if (!currentCard) return;
+	const cards = [...currentCard.parentElement.children];
+	const i = cards.indexOf(currentCard);
+	cards[(i + direction + cards.length) % cards.length].click();
+}
+
+// Makes a card behave like a button: click, Enter or Space opens the big card.
 function makeClickable(el, blockData) {
-	// CSS hook (usually used for cursor: pointer + hover states)
-	el.classList.add('clickable')
+	el.tabIndex = 0;
+	el.setAttribute("role", "button");
 
-	// Makes the <li> focusable with the keyboard (Tab key)
-	el.tabIndex = 0
+	el.addEventListener("click", (e) => {
+		if (e.target.closest("a, button")) return;
+		openModal(blockData, el);
+	});
 
-	// Helps screen readers understand this behaves like a button
-	el.setAttribute('role', 'button')
-
-	// Mouse click opens modal (unless they clicked an actual link/button inside the card)
-	el.addEventListener('click', (e) => {
-		// If the click was on an <a> or <button> inside the card, let that behave normally
-		if (e.target.closest('a, button')) return
-
-		// Otherwise open the modal for this block’s data
-		openModal(blockData)
-	})
-
-	// Keyboard support: Enter or Space should open the modal when card is focused
-	el.addEventListener('keydown', (e) => {
-		if (e.key === 'Enter' || e.key === ' ') {
-			// Spacebar normally scrolls the page — prevent that
-			e.preventDefault()
-
-			// Open the modal for this block
-			openModal(blockData)
+	el.addEventListener("keydown", (e) => {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault(); // Space would scroll the page
+			openModal(blockData, el);
 		}
-	})
+	});
 }
 
+// Card view buttons: flip, arrows and exit.
+dialog.querySelector(".btn-flip").addEventListener("click", () => {
+	showSide(dialog.classList.contains("is-flipped") ? "front" : "back");
+});
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STEP 5 — CLOSE HANDLERS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+dialog.querySelector(".btn-card-prev").addEventListener("click", () => step(-1));
+dialog.querySelector(".btn-card-next").addEventListener("click", () => step(1));
+dialog.addEventListener("keydown", (e) => {
+	if (e.key === "ArrowLeft") step(-1);
+	if (e.key === "ArrowRight") step(1);
+});
 
-// Listen for a click on the 'X' button inside the dialog
-dialogClose.addEventListener('click', () => {
-	// Close the popup
-	dialog.close()
-	// Remove the scroll lock class from the main page body
-	document.body.classList.remove('modal-open')
-})
+// Exit, Escape (built into <dialog>) or a click outside the card all close it.
+dialog.querySelector(".btn-exit").addEventListener("click", () => dialog.close());
+dialog.addEventListener("click", (e) => {
+	if (e.target === dialog) dialog.close();
+});
 
-// Listen for a click anywhere directly on the dialog background element
-dialog.addEventListener('click', (e) => {
-	// If the target clicked was the backdrop (not the content inside it)...
-	if (e.target === dialog) {
-		// Close the popup
-		dialog.close()
-		// Remove the scroll lock class
-		document.body.classList.remove('modal-open')
-	}
-})
+// Empty the front on close so a playing video stops.
+dialog.addEventListener("close", () => cardFront.replaceChildren());
 
-// Listen for the 'close' event (like when the user presses the 'Escape' key on their keyboard)
-dialog.addEventListener('close', () => {
-	// Remove the scroll lock class
-	document.body.classList.remove('modal-open')
-})
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// CHANNEL + USER HELPERS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// Define a function to put the main channel title and description onto the webpage
-function placeChannelInfo(channelData) {
-	// Find the element meant for the title
-	const titleEl = document.querySelector('#channel-title')
-	// If it exists, update its text with Are.na's channel title data
-	if (titleEl) titleEl.textContent = channelData.title || ''
-
-	// Find the element meant for the description
-	const descEl = document.querySelector('#channel-description')
-	// If it exists, inject Are.na's HTML description
-	if (descEl) descEl.innerHTML = channelData.description?.html || ''
-}
-
-// Define a function to list the channel owner/user info
-function renderUser(userData) {
-	// Find the container for user info
-	const channelUsers = document.querySelector('#channel-users')
-	// Stop running if the container isn't on the page
-	if (!channelUsers) return
-
-	// Create an HTML <address> tag
-	const address = document.createElement('address')
-	// Choose the best available name (full name, then username, then a hardcoded default)
-	const name = userData.full_name || userData.username || 'Zarah Yaqub'
-	// Build a link to their profile
-	address.innerHTML = `<p><a href="https://www.are.na/${userData.slug}">${name}</a></p>`
-	// Inject the link into the container
-	channelUsers.appendChild(address)
-}
-
-// Define a function to ask Are.na's servers for data. It handles 'pagination' (fetching page 1, then page 2, etc.)
+// Fetch helper: gets every page of an Are.na request, then hands back all the blocks at once.
 function fetchJson(url, callback, pages = []) {
-	// Use the built-in 'fetch' tool to request the URL, telling it not to use cached (old) data
-	fetch(url, { cache: 'no-store' })
-		// When the server responds, convert the raw response text into a usable JavaScript object (JSON)
+	fetch(url, { cache: "no-store" })
 		.then((res) => res.json())
-		// When the conversion is done, take that JSON data...
 		.then((json) => {
-			// Add this page's data to our running list of pages
-			pages.push(json)
-
-			// If Are.na tells us there are more pages left to grab...
+			pages.push(json);
 			if (json.meta?.has_more_pages) {
-				// Run this exact same function again, but ask for the next page number
-				fetchJson(`${url}&page=${pages.length + 1}`, callback, pages)
+				fetchJson(`${url}&page=${pages.length + 1}`, callback, pages);
 			} else {
-				// If there are no more pages, combine all the data from all the pages into one giant list
-				json.data = pages.flatMap((p) => p.data || [])
-
-				// Finally, send that giant list to whatever 'callback' function asked for it
-				callback(json)
+				json.data = pages.flatMap((p) => p.data || []);
+				callback(json);
 			}
 		})
-		// If the network request fails entirely (e.g., no internet), print an error to the hidden developer console
-		.catch((err) => console.error('Are.na fetch failed:', url, err))
+		.catch((err) => console.error("Are.na fetch failed:", url, err));
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// renderBlock — GRID CARD BUILDER
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Card builder: turns one Are.na block into a card <li> in `list`.
+function renderBlock(blockData, list) {
+	if (!list) return;
 
-// Define the main function that creates HTML cards for the grid based on block data
-function renderBlock(blockData) {
-	// Find the HTML list container where we will insert these cards
-	const channelBlocks = document.querySelector('#channel-blocks')
-	// Stop if the container doesn't exist
-	if (!channelBlocks) return
+	const li = document.createElement("li");
+	li.dataset.id = blockData.id;
 
-	// Create a brand new list item (<li>) for this block
-	const li = document.createElement('li')
-
-	// Create a reusable mini-function specifically to finish assembling the card and putting it on the screen
 	const append = () => {
-		// Add our click/keyboard listeners using the helper we made earlier
-		makeClickable(li, blockData)
-		// Add the fully prepped card into the main grid container
-		channelBlocks.appendChild(li)
-	}
+		makeClickable(li, blockData);
+		list.appendChild(li);
+	};
 
-	// ── IF the block is a Link type... ─────────────────────────────────────────
-	if (blockData.type === 'Link') {
-		// Add a specific class for styling
-		li.className = 'link-block'
-		// Tag it so our filtering system knows it belongs to the 'links' category
-		li.dataset.type = 'links'
-		// Build the inside HTML, using <picture> to let the browser pick the right size image for the screen
-		li.innerHTML = `
-			<figure>
-				<picture>
-					<source media="(max-width: 500px)"  srcset="${blockData.image?.small?.src_2x || ''}">
-					<source media="(max-width: 1000px)" srcset="${blockData.image?.medium?.src_2x || ''}">
-					<img class="media-fill" alt="${blockData.image?.alt_text || ''}" src="${blockData.image?.large?.src_2x || blockData.image?.medium?.src_2x || ''}">
-				</picture>
-			</figure>
-		`
-		// Fire the mini-function to insert it into the page, basically “Okay, this Link card is built — now run append() to actually put it on the page.”
-		append()
-		// Stop running the rest of the function (since it's already complete)
-		return
-	}
-
-	// ── IF the block is an Image type... ───────────────────────────────────────
-	if (blockData.type === 'Image') {
-		li.className = 'img-block'
-		// Tag it for the 'image' filter
-		li.dataset.type = 'image'
-		// Build a simple wrapper with a lazy-loading (when a website waits to load something until it’s actually needed, instead of loading everything up front) image
+	// A card that's just a cover or image, filling the card.
+	const cover = (src, alt, lazy = false) => {
 		li.innerHTML = `
 			<div class="media-frame">
-				<img class="media-fill" src="${blockData.image?.large?.src_2x || blockData.image?.src || ''}" alt="${blockData.image?.alt_text || ''}" loading="lazy">
+				<img class="media-fill" src="${src}" alt="${escapeHtml(alt)}"${lazy ? ' loading="lazy"' : ""}>
 			</div>
-		`
-		append()
-		return
+		`;
+		append();
+	};
+
+	if (blockData.type === "Link") return cover(LINK_COVER, blockData.title || "Link");
+	if (blockData.type === "Image")
+		return cover(blockData.image?.large?.src_2x || blockData.image?.src || "", blockData.image?.alt_text || "", true);
+	if (blockData.type === "Text") return cover(TEXT_COVER, blockData.title || "Text");
+	if (blockData.type === "Embed") return cover(VIDEO_COVER, blockData.title || "Video");
+
+	if (blockData.type === "Attachment") {
+		const ct = blockData.attachment?.content_type || "";
+		const hasFile = !!blockData.attachment?.url;
+		if (ct.includes("video") && hasFile) return cover(VIDEO_COVER, blockData.title || "Video");
+		if (ct.includes("pdf") && hasFile) return cover(TEXT_COVER, blockData.title || "PDF");
+		if (ct.includes("audio") && hasFile) return cover(AUDIO_COVER, blockData.title || "Audio");
+
+		// Any other file: just its name.
+		li.innerHTML = `<div class="media-placeholder"><p>${escapeHtml(blockData.title || "Attachment")}</p></div>`;
+		append();
 	}
+}
 
-	// ── IF the block is a Text type... ─────────────────────────────────────────
-	if (blockData.type === 'Text') {
-		li.className = 'text-block'
-		// Tag it for the 'text' filter
-		li.dataset.type = 'text'
-		// Grab the raw text from Are.na
-		const text = blockData.content?.plain || ''
-		// Create the HTML structure
-		li.innerHTML = '<div class="text-content"><p></p></div>'
-		// Use textContent (not innerHTML) to safely insert the text, preventing bugs if the user typed HTML tags
-		li.querySelector('p').textContent = text
-		append()
-		return
-	}
+// Hero: the hand of five, the phone deck and See all.
 
-	// ── IF the block is an Attachment (video, pdf, audio, etc.)... ───────────
-	if (blockData.type === 'Attachment') {
-		// Grab the file type details
-		const ct = blockData.attachment?.content_type || ''
-		// Add a base class
-		li.classList.add('attachment-block')
+// Mobile deck: on phones the five cards are a stack (see CSS).
+// Drag the top card past SWIPE_MIN and it flies off to the back; a short drag snaps back; a tap opens it.
+const mqDeck = window.matchMedia("(width <= 768px)");
+const SWIPE_MIN = 80; // px
+const FLY_MS = 250; // fly-off time before the card goes to the back
 
-		// If it's a video file...
-		if (ct.includes('video') && blockData.attachment?.url) {
-			// Add video specific class
-			li.classList.add('video-block')
-			// Tag it for the 'attachment' filter
-			li.dataset.type = 'attachment'
+function setUpDeckSwipe(heroList) {
+	let card = null; // the top card while it's dragged
+	let startX = 0;
+	let dx = 0;
+	let dragged = false;
 
-			// Ask our helper function to find a static thumbnail picture for the video
-			const thumb = getPdfOrVideoThumb(blockData)
+	heroList.addEventListener("pointerdown", (e) => {
+		if (!mqDeck.matches || heroList.closest(".is-browsing")) return;
+		const li = e.target.closest("li");
+		if (!li || li !== heroList.firstElementChild) return; // only the top card moves
+		card = li;
+		startX = e.clientX;
+		dx = 0;
+		dragged = false;
+		card.setPointerCapture(e.pointerId);
+		card.style.transition = "none"; // follow the finger exactly
+	});
 
-			if (thumb) {
-				// If a picture was found, display it. The CSS class 'video-preview' draws a play button on top.
-				li.innerHTML = `
-					<div class="media-frame video-preview">
-						<img class="media-fill" src="${thumb}" alt="${escapeHtml(blockData.title || 'Video')}" loading="lazy">
-					</div>
-				`
-			} else {
-				// If no picture exists, draw a flat colored box that says "VIDEO"
-				li.innerHTML = `
-					<div class="media-type-tile video-tile">
-						<span class="media-type-label">VIDEO</span>
-						<span class="media-type-title">${escapeHtml(blockData.title || '')}</span>
-					</div>
-				`
-			}
-			append()
-			return
-		}
+	heroList.addEventListener("pointermove", (e) => {
+		if (!card) return;
+		dx = e.clientX - startX;
+		if (Math.abs(dx) > 6) dragged = true;
+		card.style.translate = `${dx}px 0`;
+		card.style.rotate = `${dx / 20}deg`;
+	});
 
-		// If it's a PDF file...
-		if (ct.includes('pdf') && blockData.attachment?.url) {
-			// Add pdf specific class
-			li.classList.add('pdf-block')
-			// Tag it so it shows up under 'text' filters
-			li.dataset.type = 'text'
+	const release = () => {
+		if (!card) return;
+		const li = card;
+		card = null;
+		li.style.transition = "";
 
-			// Ask helper for a thumbnail (first page of the PDF)
-			const thumb = getPdfOrVideoThumb(blockData)
-
-			if (thumb) {
-				// Show the cover picture
-				li.innerHTML = `
-					<div class="media-frame pdf-preview">
-						<img class="media-fill" src="${thumb}" alt="${escapeHtml(blockData.title || 'PDF')}" loading="lazy">
-					</div>
-				`
-			} else {
-				// Fallback tile box that says "PDF"
-				li.innerHTML = `
-					<div class="media-type-tile pdf-tile">
-						<span class="media-type-label">PDF</span>
-						<span class="media-type-title">${escapeHtml(blockData.title || '')}</span>
-					</div>
-				`
-			}
-			append()
-			return
-		}
-
-		// If it's an Audio file...
-		if (ct.includes('audio') && blockData.attachment?.url) {
-			// Add audio specific class
-			li.classList.add('audio-block')
-			// Tag it for the 'audio' filter
-			li.dataset.type = 'audio'
-			// Get title or fallback text
-			const title = blockData.title || 'Audio'
-			// Draw the stylized audio box with a music note
-			li.innerHTML = `
-				<div class="audio-card">
-					<div class="audio-icon">♪</div>
-					<div class="audio-title">${escapeHtml(title)}</div>
-					<div class="audio-sub">MP3</div>
-				</div>
-			`
-			append()
-			return
-		}
-
-		// If it's some other random file format we don't recognize...
-		li.dataset.type = 'attachment'
-		// Show a generic block with the file name
-		li.innerHTML = `<div class="media-placeholder"><p>${escapeHtml(blockData.title || 'Attachment')}</p></div>`
-		append()
-		return
-	}
-
-	// ── IF the block is an Embed (YouTube, Vimeo, etc.)... ───────────────────
-	if (blockData.type === 'Embed') {
-		// Add classes
-		li.className = 'embed-block attachment-block'
-		// Tag for filter
-		li.dataset.type = 'attachment'
-
-		// Try to find a static image thumbnail representing the embed
-		const thumb = getPdfOrVideoThumb(blockData)
-
-		if (thumb) {
-			// Show thumbnail with a play button (using the 'video-preview' class)
-			li.innerHTML = `
-				<div class="media-frame video-preview">
-					<img class="media-fill" src="${thumb}" alt="${escapeHtml(blockData.title || 'Video')}" loading="lazy">
-				</div>
-			`
+		if (Math.abs(dx) > SWIPE_MIN) {
+			li.style.translate = `${Math.sign(dx) * 120}vw 0`;
+			li.style.rotate = `${Math.sign(dx) * 20}deg`;
+			setTimeout(() => {
+				li.style.translate = "";
+				li.style.rotate = "";
+				heroList.append(li);
+			}, FLY_MS);
 		} else {
-			// If no image exists, inject the actual raw iframe Are.na gave us right into the grid
-			const wrapper = document.createElement('div')
-			wrapper.className = 'media-frame embed-wrapper'
-			wrapper.innerHTML = blockData.embed?.html || ''
-
-			// Clean up widths/heights so our CSS grid takes control
-			wrapper.querySelectorAll('iframe, video').forEach((el) => {
-				el.classList.add('media-fill')
-				el.removeAttribute('width')
-				el.removeAttribute('height')
-			})
-
-			li.appendChild(wrapper)
+			li.style.translate = "";
+			li.style.rotate = "";
 		}
+	};
+	heroList.addEventListener("pointerup", release);
+	heroList.addEventListener("pointercancel", release);
 
-		append()
-		return
-	}
+	// A swipe isn't a tap: swallow the click after a drag so the big card doesn't open.
+	heroList.addEventListener(
+		"click",
+		(e) => {
+			if (dragged) e.stopPropagation();
+		},
+		true
+	);
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STEP 6 — FILTER UI WIRING
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+setUpDeckSwipe(document.querySelector("#hero-cards"));
 
-// Find the whole navigation block on the page
-const nav = document.getElementById('navigation')
+// How long the old hand gathers before Shuffle deals a new one (matches the CSS).
+const GATHER_MS = 350;
 
-// Only run the UI code if the navigation actually exists on the page
-if (nav) {
-	// Find all buttons inside nav that have a 'data-filter' attribute, and convert the result into a normal Array
-	const buttons = Array.from(nav.querySelectorAll('button[data-filter]'))
-	// Find the mobile dropdown container
-	const customSelect = document.getElementById('filter-select')
-	// Find the text label inside the mobile dropdown
-	const selectedLabel = document.getElementById('filter-selected')
-	// Find all the clickable list options inside the dropdown, turning them into an array
-	const optionItems = Array.from(document.querySelectorAll('#filter-options li'))
+// Block types renderBlock can draw; anything else would leave an empty slot.
+const HERO_TYPES = ["Image", "Link", "Text", "Attachment", "Embed"];
 
-	// Define the exact CSS class names we use to open things or select things
-	const OPEN_CLASS = 'is-open'
-	const SELECTED_CLASS = 'is-selected'
+// The hand in the fan; Back to hand returns to it.
+let lastHand = [];
 
-	// Function to highlight the active desktop button
-	const setActive = (value) => {
-		// Find the specific button that matches the clicked value
-		const activeBtn = nav.querySelector(`button[data-filter="${value}"]`)
-		// Loop through all buttons. If the button matches 'activeBtn', turn ON the 'active' class. Otherwise, turn it OFF.
-		buttons.forEach((btn) => btn.classList.toggle('active', btn === activeBtn))
-	}
+// Deals 5 random blocks into the fan, or re-deals a given hand.
+function dealHeroCards(blocks, hand = null) {
+	const heroList = document.querySelector("#hero-cards");
+	if (!heroList) return;
+	heroList.replaceChildren();
 
-	// Function to update text on the mobile dropdown
-	const setDropdownLabel = (value) => {
-		// Find the specific dropdown list item that matches the value
-		const match = optionItems.find((li) => li.dataset.value === value)
-		// If it exists, change the visible label text to match it
-		if (selectedLabel) selectedLabel.textContent = match ? match.textContent : 'All'
-
-		// Loop through all dropdown options to update the checkmark/highlight styling
-		optionItems.forEach((li) => {
-			li.classList.toggle(SELECTED_CLASS, li.dataset.value === value)
-		})
-	}
-
-	// Master function to run everything when a filter changes
-	const setFilter = (value) => {
-		// Guarantee lowercase text
-		const v = (value || 'all').toLowerCase()
-		// Update the desktop buttons
-		setActive(v)
-		// Update the mobile dropdown UI
-		setDropdownLabel(v)
-		// Actually filter the grid elements
-		applyFilter(v)
-	}
-
-	// Function to forcibly close the mobile dropdown menu
-	const closeDropdown = () => {
-		// Remove the CSS open class
-		if (customSelect) customSelect.classList.remove(OPEN_CLASS)
-	}
-
-	// Function to toggle the mobile dropdown menu (open if closed, close if open)
-	const toggleDropdown = () => {
-		if (!customSelect) return
-		customSelect.classList.toggle(OPEN_CLASS)
-	}
-
-	// When the page first loads, immediately run the master function using our default filter
-	setFilter(DEFAULT_FILTER)
-
-	// Find the block containing the desktop buttons
-	const filterButtonRow = nav.querySelector('.filter-buttons')
-	// Create a listener for screen size: true if the screen is under 768px wide (mobile size)
-	const mqMobile = window.matchMedia('(max-width: 768px)')
-
-	// Function that determines which UI to show based on screen size
-	const syncNavMode = () => {
-		// Check our window size watcher (true or false)
-		const isMobile = mqMobile.matches
-		// If mobile, hide the desktop button row
-		if (filterButtonRow) filterButtonRow.hidden = isMobile
-		// If mobile, show the dropdown (or vice versa if not mobile)
-		if (customSelect) customSelect.hidden = !isMobile
-	}
-
-	// Run the sync function immediately on load
-	syncNavMode()
-	// Add an event listener to run syncNavMode whenever the user rotates their phone or resizes their browser window
-	mqMobile.addEventListener?.('change', syncNavMode)
-	window.addEventListener('resize', syncNavMode)
-
-
-	// If the mobile dropdown label exists...
-	if (selectedLabel) {
-		// Allow keyboards to focus on it
-		selectedLabel.tabIndex = 0
-
-		// Wait for the user to click it
-		selectedLabel.addEventListener('click', (e) => {
-			// Prevent this click from bubbling up and triggering the 'close clicking outside' listener below
-			e.stopPropagation()
-			// Open/close the menu
-			toggleDropdown()
-		})
-
-		// Wait for the user to press Enter or Space while focused on it
-		selectedLabel.addEventListener('keydown', (e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
-				e.preventDefault()
-				toggleDropdown()
-			}
-		})
-	}
-
-	// Look through every single dropdown option item...
-	optionItems.forEach((li) => {
-		// When one is clicked...
-		li.addEventListener('click', (e) => {
-			e.stopPropagation()
-			// Figure out what filter string it contains, or fallback to default
-			const filter = li.dataset.value || DEFAULT_FILTER
-			// Trigger the master filter update
-			setFilter(filter)
-			// Hide the menu
-			closeDropdown()
-		})
-	})
-
-	// Listen for a click *anywhere* on the entire webpage
-	document.addEventListener('click', (e) => {
-		// If the mobile menu exists, AND the place they clicked was NOT inside the menu...
-		if (customSelect && !customSelect.contains(e.target)) {
-			// Close the menu
-			closeDropdown()
+	if (!hand) {
+		// Fisher–Yates on a copy, so the channel order isn't touched.
+		const pool = blocks.filter((b) => HERO_TYPES.includes(b.type));
+		for (let i = pool.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[pool[i], pool[j]] = [pool[j], pool[i]];
 		}
-	})
+		hand = pool.slice(0, 5);
+	}
 
-	// Desktop listener: click anywhere on the navigation bar area
-	nav.addEventListener('click', (e) => {
-		// See if the click target (or its parent) was one of our data-filter buttons
-		const btn = e.target.closest('button[data-filter]')
-		// If they clicked empty space instead of a button, stop running here
-		if (!btn) return
-		// Otherwise, trigger the master filter using that button's custom data string
-		setFilter(btn.dataset.filter)
-	})
+	lastHand = hand;
+	hand.forEach((block) => renderBlock(block, heroList));
 }
 
+// See all: the fan straightens into a row of every card, #1 → last,
+// with arrows (or ← →) and a counter.
+const hero = document.querySelector(".hero");
+const heroCards = document.querySelector("#hero-cards");
+const seeAllLabel = document.querySelector(".btn-see-all-label");
+const browseCount = document.querySelector(".browse-count");
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STEP 7 — API CALLS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Every displayable block in the order it was added (set once the channel loads).
+let browseList = [];
 
-// Use our fetch tool to grab the general channel details (Title, Description, Owner)
-fetchJson(`https://api.are.na/v3/channels/${channelSlug}`, (json) => {
-	// Put the Title/Description on the page
-	placeChannelInfo(json)
-	// Put the Owner's link on the page
-	renderUser(json.owner)
-})
+const isBrowsing = () => hero.classList.contains("is-browsing");
 
-// Use our fetch tool to grab specific details about your personal user profile
-fetchJson(`https://api.are.na/v3/users/${myUsername}/`, (json) => {
-	// Put your user info on the page (usually for a footer credit)
-	renderUser(json)
-})
+// Distance between cards in the row (they overlap, so measure it).
+function rowStep() {
+	const [first, second] = heroCards.children;
+	return first && second ? second.offsetLeft - first.offsetLeft : 0;
+}
 
-// Use our fetch tool to pull every single content block out of the channel, grabbing 100 per page, sorted newest first
+function updateBrowseCount() {
+	const i = Math.round(heroCards.scrollLeft / rowStep()) + 1;
+	browseCount.textContent = `${Math.min(Math.max(i, 1), browseList.length)} / ${browseList.length}`;
+}
+
+// Runs a layout change as a view transition, so the cards in `ids` glide to their new spot.
+// Instant when unsupported or the visitor prefers reduced motion.
+let morphing = false; // blocks a second click mid-morph
+
+function morph(ids, update) {
+	morphing = true;
+	const name = () =>
+		heroCards.querySelectorAll("li").forEach((li) => {
+			li.style.viewTransitionName = ids.includes(li.dataset.id) ? `card-${li.dataset.id}` : "";
+		});
+	const done = () => {
+		heroCards.querySelectorAll("li").forEach((li) => {
+			li.style.viewTransitionName = "";
+		});
+		heroCards.classList.remove("no-deal");
+		morphing = false;
+	};
+
+	heroCards.classList.add("no-deal"); // the morph moves the cards, so no deal-in animation
+
+	const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	if (!document.startViewTransition || reduceMotion) {
+		update();
+		done();
+		return;
+	}
+	name();
+	const transition = document.startViewTransition(() => {
+		update();
+		name();
+	});
+	transition.ready.catch(() => {}); // a skipped transition rejects; the layout still changes
+	transition.finished.finally(done);
+}
+
+function enterBrowse() {
+	const ids = lastHand.map((b) => String(b.id));
+	// Start on the top of the phone deck, or the middle of the fan, so it straightens in place.
+	const focusId = (mqDeck.matches ? heroCards.firstElementChild : heroCards.children[2])?.dataset.id;
+	morph(ids, () => {
+		hero.classList.add("is-browsing");
+		heroCards.setAttribute("aria-label", "Every piece in the collection");
+		heroCards.replaceChildren();
+		browseList.forEach((block) => renderBlock(block, heroCards));
+
+		const focus = heroCards.querySelector(`li[data-id="${focusId}"]`);
+		heroCards.scrollLeft = focus ? [...heroCards.children].indexOf(focus) * rowStep() : 0;
+		updateBrowseCount();
+	});
+	seeAllLabel.textContent = "Back to hand";
+}
+
+function exitBrowse() {
+	morph(
+		lastHand.map((b) => String(b.id)),
+		() => {
+			hero.classList.remove("is-browsing");
+			heroCards.setAttribute("aria-label", "Five random pieces from the collection");
+			heroCards.scrollLeft = 0;
+			dealHeroCards(null, lastHand); // the same hand, not a new shuffle
+		}
+	);
+	seeAllLabel.textContent = "See all";
+}
+
+document.querySelector(".btn-see-all").addEventListener("click", () => {
+	if (!browseList.length || morphing) return; // still loading, or mid-morph
+	isBrowsing() ? exitBrowse() : enterBrowse();
+});
+
+// Arrows, or ← → while the big card is closed, move one card.
+const browseStep = (direction) => heroCards.scrollBy({ left: direction * rowStep(), behavior: "smooth" });
+document.querySelector(".btn-prev").addEventListener("click", () => browseStep(-1));
+document.querySelector(".btn-next").addEventListener("click", () => browseStep(1));
+document.addEventListener("keydown", (e) => {
+	if (!isBrowsing() || dialog.open) return;
+	if (e.key === "ArrowLeft") browseStep(-1);
+	if (e.key === "ArrowRight") browseStep(1);
+});
+heroCards.addEventListener("scroll", () => {
+	if (isBrowsing()) updateBrowseCount();
+});
+
+// Load the channel and deal the first hand.
 fetchJson(`https://api.are.na/v3/channels/${channelSlug}/contents?per=100&sort=position_desc`, (json) => {
-	// Take that giant array of data, and loop through it. Run our card builder (renderBlock) on every single piece.
-	json.data.forEach(renderBlock)
-	// Re-run the filter logic now that all the cards exist on the page to make sure the default hides the right ones
-	applyFilter(currentFilter)
-	// After cards exist, enable/disable the mobile-only highlight observer
-	syncHighlightMode()
-	// If we ARE in mobile mode, make sure the observer is watching the visible cards
-	refreshObserverTargets()
-})
+	// Number blocks by when they were added (#1 = first). Not connection.position:
+	// that's the display order, which changes when blocks are rearranged. Ties → lower id first.
+	const byAdded = [...json.data].sort(
+		(a, b) => a.connection.connected_at.localeCompare(b.connection.connected_at) || a.id - b.id
+	);
+	byAdded.forEach((block, i) => {
+		block.addedNumber = i + 1;
+	});
+
+	browseList = byAdded.filter((block) => HERO_TYPES.includes(block.type));
+	dealHeroCards(json.data);
+
+	// Shuffle: gather the old hand into the centre (CSS .is-gathering), then deal a new one.
+	document.querySelector(".btn-shuffle")?.addEventListener("click", () => {
+		const heroList = document.querySelector("#hero-cards");
+		if (heroList.classList.contains("is-gathering")) return; // mid-shuffle
+
+		const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		heroList.classList.add("is-gathering");
+		setTimeout(
+			() => {
+				heroList.classList.remove("is-gathering");
+				dealHeroCards(json.data);
+			},
+			reduceMotion ? 0 : GATHER_MS
+		);
+	});
+});

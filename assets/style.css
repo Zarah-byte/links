@@ -1,725 +1,880 @@
-/* ===================== DESIGN TOKENS ===================== */
+/* Fonts */
+/* Local font (folder name ends in a space, hence the %20) */
+@font-face {
+    font-family: "Bonbance";
+    src:
+        url("fonts/XCicero_Bonbance%20/Bonbance-BoldCondensed.woff2") format("woff2"),
+        url("fonts/XCicero_Bonbance%20/Bonbance-BoldCondensed.woff") format("woff");
+    font-weight: 700;
+    font-stretch: condensed;
+    font-display: swap;
+}
+
+/* Design tokens */
 :root {
-	--background: #F0EFEC;
-	--text: #121212;
+    --background: #f0efec;
+    --text: #121212;
 
-	--accent-pdf: #111414;
-	--accent-link: #2d4a3e;
+    /* Card corners: outer radius = inner radius + border, so the curves are concentric. */
+    --card-inner-radius: 0.5rem;
+    --card-border: 0.5rem; /* small cards (fan, deck, row) */
+    --card-border-big: 0.75rem; /* the big card view */
+    --card-shadow: 0 0.75rem 2rem rgb(0 0 0 / 0.55);
+    --media-border: var(--card-border) solid var(--background);
+    --embed-scale: 1.35;
 
-	--accent-video: #1f2b26;
+    /* Type scale: 16px base, Bringhurst steps (14 16 18 24 36). */
+    --text-sm: 0.875rem; /* 14 — placeholder notes */
+    --text-base: 1rem; /* 16 — mono labels and buttons, tags */
+    --text-md: 1.125rem; /* 18 — reading text: About, card Source, text cards */
+    --text-xl: 1.5rem; /* 24 — About title, card name on phones */
+    --text-2xl: 2.25rem; /* 36 — site title, card name */
 
-	--media-border: 0.5rem solid var(--background);
-	--embed-scale: 1.35;
+    --leading-tight: 1.1; /* display type */
+    --leading-snug: 1.25; /* one-line display that needs room for descenders */
+    --leading-body: 1.5; /* running text */
+    --tracking-caps: 0.04em; /* DM Mono capitals */
 
-	--body-copy: 1.25rem;
-	--small-copy: 1rem;
-	--h2-copy: calc(var(--body-copy) * 1.5);
-	--h3-copy: var(--body-copy);
-	--font-body: "Syne", "Helvetica", sans-serif;
-	--font-heading: "Bokor", serif;
+    /* Display, text, and buttons/labels. */
+    --font-display: "Bonbance", serif;
+    --font-body: "DM Sans", "Helvetica", sans-serif;
+    --font-mono: "DM Mono", monospace;
 
-	--gutter: calc(var(--body-copy) * 1.5);
-	--padding-1: 1rem;
-	--padding-2: 2rem;
+    --about-bg: #ffffff;
+    --about-button: #d6d6d6;
 
-	scroll-behavior: smooth;
+    --padding-1: 1rem;
+    --padding-2: 2rem;
+    --header-h: 6.125rem; /* fixed so the hero can fill exactly the rest of the screen */
+    --page-gutter: 2.75rem; /* left/right edge space: header, See all arrows */
+
+    scroll-behavior: smooth;
 }
 
-/* ===================== BASE ===================== */
+/* Base */
+h1,
+h2 {
+    text-wrap: balance;
+}
+
+p {
+    text-wrap: pretty;
+}
+
 body {
-	font-family: var(--font-body);
-	background: var(--text);
-	color: var(--background);
-	font-size: 1rem;
+    font-family: var(--font-body);
+    background: var(--text);
+    color: var(--background);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
 
-	a {
-		color: inherit;
-		text-decoration: underline;
-		text-underline-offset: 0.25rem;
-	}
+    a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 0.25rem;
+    }
 }
 
-body.modal-open {
-	overflow: hidden;
-}
-
-/* ===================== HEADER ===================== */
+/* Header / nav */
 header {
-	padding: 1rem;
-	display: flex;
-	justify-content: space-between;
-	border-bottom: 0.2rem solid var(--background);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 
-	#logo,
-	#channel-link {
-		fill: var(--background);
-		width: auto;
-		height: 2rem;
-	}
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--header-h);
+    padding: 0 var(--page-gutter);
+    background: var(--text);
+
+    .site-title {
+        font-family: var(--font-display);
+        font-size: var(--text-2xl); /* condensed display reads small, so it sits a step above the controls */
+        line-height: var(--leading-tight);
+        text-decoration: none;
+    }
+
+    .btn-info {
+        display: grid;
+        place-items: center;
+        width: 2.625rem;
+        aspect-ratio: 1;
+        padding: 0.3rem;
+        border: 0.1rem solid var(--background);
+        border-radius: 0.2rem;
+        background: transparent;
+        color: var(--background);
+        cursor: pointer;
+        transition:
+            background 0.2s ease,
+            color 0.2s ease;
+
+        /* Hover / keyboard focus: fill white, icon goes dark */
+        &:hover,
+        &:focus-visible {
+            background: var(--background);
+            color: var(--text);
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+    }
 }
 
-/* ===================== NAV ===================== */
-#navigation {
-	position: sticky;
-	top: 0;
-	z-index: 1000;
+@media (width <= 768px) {
+    :root {
+        --header-h: 4.625rem;
+        --page-gutter: 1rem;
+    }
 
-	padding: 1rem;
-	margin-bottom: 2rem;
-	background: var(--text);
-	border-top: 0.2rem solid var(--background);
-	border-bottom: 0.2rem solid var(--background);
-
-	.filter-buttons {
-		display: flex;
-		justify-content: space-between;
-		gap: 2rem;
-	}
-
-	button {
-		flex: 1;
-		cursor: pointer;
-
-		font-family: var(--font-body);
-		font-size: 1rem;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		text-align: center;
-
-		padding: 0.45rem 0.75rem;
-		border-radius: 10rem;
-		border: 0.1rem solid var(--background);
-		background: transparent;
-		color: var(--background);
-		transition: background 0.2s ease, color 0.2s ease;
-	}
-
-	button.active {
-		background: var(--background);
-		color: var(--text);
-	}
-
-	#filter-options li.is-selected {
-		background: var(--background);
-		color: var(--text);
-	}
+    header {
+        padding: 0 var(--page-gutter);
+    }
 }
 
+/* Hero: a fan of 5 cards */
+/* Nav + hero fill one screen (svh allows for mobile browser bars). */
+.hero {
+    --button-space: 9rem; /* button + gap + padding, left over for the fan */
 
-
-#filter-select {
-	display: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    height: calc(100svh - var(--header-h));
+    transition: filter 0.3s ease;
+    padding: 2rem 0;
+    overflow: clip; /* outer cards may poke past the edge on small screens */
 }
 
-/* Mobile */
-@media (width <=768px) {
-	.filter-buttons {
-		display: none;
-	}
+/* Cards + See all arrows; sizes live here so both can use them. */
+.hero-stage {
+    /* Card width, capped so the fan fits the hero; 28vw at 8° spans ~94% of the screen. */
+    --w: min(28vw, 30rem, (100svh - var(--header-h) - var(--button-space)) / 1.7);
+    --step: 8deg; /* angle between neighbouring cards */
 
-	#filter-select {
-		display: block;
-		width: 100%;
-	}
+    position: relative;
+    flex-shrink: 0; /* keep its height in every mode, so the buttons below never move */
+    width: 100%;
 }
 
-#filter-selected {
-	border: 0.1rem solid var(--background);
-	border-radius: 10rem;
-	padding: 0.6rem 0.9rem;
-	cursor: pointer;
-	user-select: none;
-	transition: background 0.2s ease;
+#hero-cards {
+    position: relative;
+    width: 100%;
+    height: calc(var(--w) * 1.7); /* card height + how far the outer cards drop */
+
+    li {
+        position: absolute;
+        top: calc(var(--w) * 0.03); /* the tilted cards' top corners rise slightly above the middle one */
+        left: calc(50% - var(--w) / 2);
+        width: var(--w);
+        aspect-ratio: 5 / 7;
+
+        border: var(--media-border);
+        border-radius: calc(var(--card-inner-radius) + var(--card-border));
+        overflow: hidden;
+        background: var(--text);
+        box-shadow: var(--card-shadow); /* separates cards where they overlap */
+        cursor: pointer;
+
+        /* Pivot far below the card, so rotating alone lays the cards on an arc */
+        transform-origin: 50% 310%;
+        transform: rotate(calc(var(--i) * var(--step)));
+
+        /* Deal: cards swing out from the centre, 70ms apart. */
+        --deal-delay: calc((var(--i) + 2) * 70ms);
+        transition:
+            translate 0.2s ease,
+            rotate 0.2s ease,
+            transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) var(--deal-delay),
+            opacity 0.3s ease var(--deal-delay);
+
+        /* New cards start stacked in the centre. */
+        @starting-style {
+            transform: rotate(0deg) translateY(1.5rem);
+            opacity: 0;
+        }
+
+        /* Lift the card you're pointing at and bring it to the front */
+        &:hover,
+        &:focus-visible {
+            translate: 0 -1rem;
+            z-index: 10;
+            outline: none;
+        }
+    }
+
+    /* Shuffle: gather the old hand into the centre and fade it. */
+    &.is-gathering li {
+        --deal-delay: 0s;
+        transform: rotate(0deg) translateY(1.5rem);
+        opacity: 0;
+    }
+
+    /* Position in the fan (-2 … 2); the middle card sits on top */
+    li:nth-child(1) {
+        --i: -2;
+        z-index: 1;
+    }
+    li:nth-child(2) {
+        --i: -1;
+        z-index: 2;
+    }
+    li:nth-child(3) {
+        --i: 0;
+        z-index: 3;
+    }
+    li:nth-child(4) {
+        --i: 1;
+        z-index: 2;
+    }
+    li:nth-child(5) {
+        --i: 2;
+        z-index: 1;
+    }
 }
 
-#filter-options {
-	display: none;
-	margin-top: 0.5rem;
-	border: 0.1rem solid var(--background);
-	border-radius: 1rem;
-	overflow: hidden;
+/* Reduced motion: no swinging cards. */
+@media (prefers-reduced-motion: reduce) {
+    #hero-cards li {
+        transition: none;
+    }
 }
 
-#filter-options li {
-	padding: 0.8rem 1rem;
-	cursor: pointer;
-
-	.is-selected {
-		background: var(--background);
-		color: var(--text);
-	}
+/* Mix a Drink + Shuffle, side by side */
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
 }
 
+@media (width <= 768px) {
+    /* Phones: a swipeable deck (arena.js setUpDeckSwipe); the cards behind peek out. */
+    .hero-stage {
+        --peek: 1.1rem; /* how far each card behind drops below the one in front */
+        --w: min(90vw, (100svh - var(--header-h) - var(--button-space) - var(--peek) * 3 - 1rem) / 1.4);
+    }
 
-/* ===================== TITLE ===================== */
-hgroup {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
+    #hero-cards {
+        height: calc(var(--w) * 1.4 + var(--peek) * 3); /* the card + room for the peeking edges */
 
-	h1 {
-		margin-top: 8rem;
-		padding-bottom: 10rem;
-		font-family: var(--font-heading);
-		font-size: 5rem;
-		letter-spacing: 0.01em;
-		line-height: 1;
-		text-align: center;
-		text-transform: uppercase;
-	}
+        li {
+            top: 0;
+            transform-origin: 50% 50%;
+            transform: translateY(calc(var(--depth) * var(--peek))) rotate(var(--tilt))
+                scale(calc(1 - var(--depth) * 0.05));
+            touch-action: pan-y; /* horizontal drags are ours, vertical still scrolls */
+
+            /* Tapping on a phone leaves :hover stuck, so no lift here */
+            &:hover {
+                translate: none;
+            }
+        }
+
+        /* Depth in the deck: 0 = top card */
+        li:nth-child(1) {
+            --depth: 0;
+            --tilt: 0deg;
+            z-index: 5;
+        }
+        li:nth-child(2) {
+            --depth: 1;
+            --tilt: -5deg;
+            z-index: 4;
+        }
+        li:nth-child(3) {
+            --depth: 2;
+            --tilt: 5deg;
+            z-index: 3;
+        }
+        li:nth-child(4) {
+            --depth: 3;
+            --tilt: -2deg;
+            z-index: 2;
+        }
+        li:nth-child(5) {
+            --depth: 3;
+            --tilt: 2deg;
+            z-index: 1;
+        }
+    }
 }
 
-/* ===================== GRID ===================== */
-.blocks {
-	padding: 2rem 0;
-
-	ul {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 2rem;
-		padding: 0 0.5rem;
-	}
-
-	li {
-		height: 90vh;
-	}
-
-	li.clickable {
-		cursor: pointer;
-	}
-
-	li:nth-child(2n+1):hover {
-		transform: rotate(-5deg);
-	}
+/* See all: the fan straightened into a row */
+/* Every card in a snapping row (.is-browsing, set by arena.js). */
+.hero.is-browsing .hero-stage {
+    /* Own width variable: the box height comes from --w, so the buttons below never move.
+       The row scrolls sideways, which clips anything outside it, so leave room for the hover lift + shadow. */
+    --row-room: 3rem;
+    --row-w: min(var(--w) * 1.25, (var(--w) * 1.7 - var(--row-room) * 2) / 1.4);
+    --overlap: calc(var(--row-w) * 0.08); /* each card tucks slightly under the next, like the fan */
 }
 
-/* Card frame */
-.blocks li {
-	border: var(--media-border);
-	border-radius: 1.25rem;
-	overflow: hidden;
-	transition: border-color 0.2s ease, transform 0.2s ease;
+.hero.is-browsing #hero-cards {
+    display: flex;
+    align-items: center; /* the row sits in the middle of the fan-sized box */
+    padding-inline: calc(50% - var(--row-w) / 2); /* lets the first/last card sit centred */
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
 
-	&:hover,
-	&.highlight {
-		/* Mobile uses `.highlight` (IntersectionObserver), desktop uses `:hover` */
-		transform: rotate(5deg) scale(0.8);
-		border-color: color-mix(in srgb, var(--background) 85%, transparent);
-	}
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
-	&:nth-child(2n+1):hover,
-	&:nth-child(2n+1).highlight {
-		transform: rotate(-5deg) scale(0.8);
-	}
+    /* Undo the fan / deck: cards sit flat, side by side */
+    li {
+        position: static;
+        flex: 0 0 var(--row-w);
+        transform: none;
+        z-index: auto;
+        scroll-snap-align: center;
+        transition: translate 0.2s ease;
 
-	&:active {
-		transform: translateY(0);
-	}
+        & + li {
+            margin-left: calc(var(--overlap) * -1);
+        }
 
-	&:focus-visible {
-		outline: 0.2rem solid color-mix(in srgb, var(--background) 70%, transparent);
-		outline-offset: 0.25rem;
-	}
+        /* The card you point at comes to the front of the overlap */
+        &:hover,
+        &:focus-visible {
+            z-index: 10;
+        }
+    }
 }
 
-/* ===================== MEDIA STUFF ===================== */
+/* Fan ⇄ row morph (View Transitions), slow enough to follow each card. */
+::view-transition-group(*) {
+    animation-duration: 0.7s;
+    animation-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.45s;
+}
+
+/* No deal-in animation during the morph. */
+.hero #hero-cards.no-deal li {
+    transition: none;
+}
+
+/* ← 12 / 146 → — only while browsing; Shuffle hides then */
+.browse-nav {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.hero.is-browsing {
+    .browse-nav {
+        display: flex;
+    }
+
+    .btn-shuffle {
+        display: none;
+    }
+}
+
+/* See all arrows: at the screen edges, lined up with the header. */
+.hero-stage .btn-browse {
+    display: none;
+    position: absolute;
+    top: 50%;
+    z-index: 20; /* above the cards, including a lifted one */
+    translate: 0 -50%;
+}
+
+.hero.is-browsing .btn-browse {
+    display: inline-flex;
+}
+
+.btn-prev {
+    left: var(--page-gutter);
+}
+
+.btn-next {
+    right: var(--page-gutter);
+}
+
+.browse-count {
+    min-width: 7ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    letter-spacing: var(--tracking-caps);
+    text-align: center;
+}
+
+/* Phones: bigger row cards, neighbours peek in. */
+@media (width <= 768px) {
+    /* Row cards: 80% wide, but never taller than the deck's box */
+    .hero.is-browsing .hero-stage {
+        --row-w: min(80vw, (var(--w) * 1.4 + var(--peek) * 3 - var(--row-room) * 2) / 1.4);
+    }
+}
+
+/* Media inside cards */
 .media-frame {
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .media-fill {
-	width: 100%;
-	height: 100%;
-	display: block;
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 :is(img, video).media-fill {
-	object-fit: cover;
-	object-position: center;
+    object-fit: cover;
+    object-position: center;
 }
 
-#channel-blocks .media-frame.embed-wrapper {
-	position: relative;
-	overflow: hidden;
+#hero-cards .media-frame.embed-wrapper {
+    position: relative;
+    overflow: hidden;
 }
 
-#channel-blocks .embed-wrapper .media-fill:is(iframe, video) {
-	position: absolute;
-	inset: 0;
-	margin: auto;
-	transform: scale(var(--embed-scale));
-	border: 0;
+#hero-cards .embed-wrapper .media-fill:is(iframe, video) {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    transform: scale(var(--embed-scale));
+    border: 0;
 }
 
-/* ===================== AUDIO TILE ===================== */
-.audio-card {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 0.75rem;
-
-	background: var(--accent-pdf);
-	color: var(--background);
-	text-align: center;
-	padding: 2rem;
-
-	.audio-icon {
-		font-size: 3rem;
-		opacity: 0.4;
-	}
-
-	.audio-title {
-		font-size: 1rem;
-		font-weight: 600;
-	}
-
-	.audio-sub {
-		font-size: 0.7rem;
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-		opacity: 0.45;
-	}
-}
-
-/* ===================== TEXT TILE ===================== */
+/* Text: front of the big card (the fan shows a cover) */
 .text-block {
-	.text-content {
-		height: 100%;
-		padding: 1.5rem;
-		display: flex;
-		align-items: flex-start;
+    .text-content {
+        height: 100%;
+        padding: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        overflow-y: auto; /* long texts (poems, essays) scroll inside the card */
 
-		p {
-			padding-top: 4rem;
-			text-align: center;
-			font-size: 1rem;
-			line-height: 2;
-		}
-	}
+        p {
+            padding-top: 4rem;
+            text-align: center;
+            font-size: var(--text-md);
+            line-height: var(--leading-body);
+        }
+    }
 }
 
 .media-placeholder {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 2rem;
-	text-align: center;
-	font-size: 0.85rem;
-	opacity: 0.5;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    font-size: var(--text-sm);
+    opacity: 0.5;
 }
 
-/* ===================== FOOTER + ABOUT ===================== */
-footer {
-	font-size: var(--small-copy);
-	margin: 1rem 1rem 2rem;
-	display: flex;
-	flex-direction: column;
+/* About popup */
+/* Stop the page scrolling behind the About popup */
+body:has(.about:popover-open) {
+    overflow: hidden;
 }
 
-.description {
-	margin: 5rem auto 8rem;
-	padding: 0 1rem;
-	max-width: 60ch;
-	text-align: center;
+/* Full-screen white sheet (native popover). */
+.about[popover] {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 5rem 1.25rem 3rem;
+    border: none;
+    overflow-y: auto;
 
-	h2 {
-		font-family: var(--font-heading);
-		font-size: var(--h2-copy);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
+    background: var(--about-bg);
+    color: var(--text);
+    font-size: var(--text-md);
+    line-height: var(--leading-body);
 
-	a:hover {
-		text-decoration: underline;
-	}
+    /* Only lay out as flex while open, so the closed popover stays hidden */
+    &:popover-open {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: safe center; /* centred when it fits; starts at the top when it has to scroll */
+        gap: 2.5rem;
+    }
 
-	.curate-tag {
-		padding-top: 1rem;
-	}
+    h2 {
+        font-family: var(--font-display);
+        font-size: var(--text-xl); /* a step below the site title ("Mix a Drink!") */
+        font-weight: 700;
+        line-height: var(--leading-tight);
+        text-align: center;
+    }
+
+    /* Description + credits: one block, a normal paragraph gap between them */
+    .about-text p + p {
+        margin-top: 1em;
+    }
+
+    p {
+        max-width: 22em;
+    }
+
+    p a {
+        text-decoration: underline;
+        text-underline-offset: 0.15em;
+    }
 }
 
-/* ===================== PDF + VIDEO PREVIEWS ===================== */
+.btn-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 2rem;
+    aspect-ratio: 1;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    cursor: pointer;
 
-.pdf-preview {
-	position: relative;
+    /* Same line weight as every other icon (see the grey-button rule) */
+    svg {
+        width: 100%;
+        height: 100%;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.45px;
 
-	::after {
-		content: 'PDF';
-		position: absolute;
-		bottom: 0.75rem;
-		left: 0.75rem;
-
-		font-size: 0.6rem;
-		letter-spacing: 0.2em;
-		text-transform: uppercase;
-
-		color: var(--background);
-		background: rgba(0, 0, 0, 0.55);
-		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		pointer-events: none;
-	}
+        * {
+            vector-effect: non-scaling-stroke;
+        }
+    }
 }
 
-.media-type-tile {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 1rem;
-	padding: 2rem;
-	text-align: center;
-	color: var(--background);
+/* Stacked on phones; the "Find" buttons share a width. */
+.about-links {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
 }
 
-.media-type-label {
-	font-size: 0.6rem;
-	letter-spacing: 0.25em;
-	text-transform: uppercase;
-	opacity: 0.65;
-	border: 0.08rem solid var(--accent-pdf);
-	padding: 0.3rem 0.65rem;
-	border-radius: 4px;
+/* Grey mono buttons. */
+.about-links a,
+.pill-button,
+.card-arena-link {
+    /* Line icons: reset.css wipes the svg's own fill/stroke, so set them here (2.45px = the ⓘ). */
+    svg {
+        width: 1.4em;
+        height: 1.4em;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.45px;
+
+        * {
+            vector-effect: non-scaling-stroke; /* stroke-width in screen px, not icon units */
+        }
+    }
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35em;
+    min-width: 9.25rem;
+    padding: 1rem 0.75rem;
+    border-radius: 0.4rem;
+    background: var(--about-button);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+        background: var(--text);
+        color: var(--about-bg);
+    }
 }
 
-.media-type-title {
-	font-family: var(--font-heading);
-	font-size: 1.5rem;
-	line-height: 1.25;
+/* Pill buttons sit on the black page, so they go white on hover. */
+.pill-button {
+    min-width: 0; /* size to the label */
+    gap: 0.75em;
+    font-size: var(--text-base); /* mono caps read large; base keeps controls below the title */
+    padding: 1rem 1.25rem;
+    border: none;
+    cursor: pointer;
+
+    /* Dark-on-hover would vanish on the black page, so go white instead */
+    &:hover,
+    &:focus-visible {
+        background: var(--about-bg);
+        color: var(--text);
+    }
 }
 
-.pdf-tile {
-	background: var(--accent-pdf);
+/* Desktop: a centred card over the blurred fan. */
+@media (width >= 769px) {
+    .about[popover] {
+        width: fit-content;
+        max-width: min(66rem, 100% - 4rem);
+        height: fit-content;
+        max-height: calc(100% - 4rem);
+        margin: auto;
+        padding: 4.5rem 2rem 2rem;
+        border-radius: 0.75rem;
+
+        /* The .hero blur does the work; the header stays visible. */
+        &::backdrop {
+            background: transparent;
+        }
+    }
+
+    .btn-close {
+        top: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .about-links {
+        display: flex;
+        gap: 2rem;
+
+        a {
+            padding: 1.25rem 1rem;
+        }
+    }
 }
 
-.video-tile {
-	background: var(--accent-video);
+/* Card view: the picked card, big and flippable */
+/* Blur the fan behind the open card; the header stays sharp */
+body:has(#dialog[open]) .hero,
+body:has(.about:popover-open) .hero {
+    filter: blur(14px);
 }
 
-/* ===================== MODAL ===================== */
 #dialog {
-	position: fixed;
-	inset: 0;
-	margin: auto;
+    --card-h: min(70svh, 70vw * 7 / 5); /* big card height; width follows at 5:7 */
 
-	width: min(560px, 92vw);
-	max-height: 90vh;
-	padding: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: var(--header-h) 0 0;
+    border: none;
+    background: transparent;
+    color: var(--text);
 
-	display: none;
-	flex-direction: column;
-	overflow: hidden;
+    &[open] {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2.5rem;
+    }
 
-	background: var(--background);
-	color: var(--text);
-	font-family: var(--font-body);
-	border-radius: 1.5rem;
-
-	border: var(--media-border);
-
-	transform: scale(0.95) translateY(1rem);
-	opacity: 0;
-	transition:
-		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-		opacity 0.25s ease;
-
-	&[open] {
-		display: flex;
-		transform: none;
-		opacity: 1;
-	}
-
-	&::backdrop {
-		background: rgba(18, 18, 18, 0.55);
-		backdrop-filter: blur(6px);
-		-webkit-backdrop-filter: blur(6px);
-	}
-
-	.dialog-close {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		z-index: 10;
-
-		width: 2rem;
-		height: 2rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		background: transparent;
-		border: 0;
-		color: var(--text);
-		cursor: pointer;
-		opacity: 0.5;
-		transition: opacity 0.15s ease;
-
-		svg {
-			display: block;
-		}
-
-		&:hover {
-			opacity: 1;
-		}
-	}
-
-	.dialog-meta {
-		flex: 1 1 auto;
-		min-height: 0;
-		overflow: auto;
-
-		padding: 1.75rem 1.75rem 1.25rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
-
-	.dialog-title {
-		font-family: var(--font-heading);
-		font-size: 1.6rem;
-		letter-spacing: 0.01em;
-		line-height: 1.2;
-		padding-right: 2rem;
-	}
-
-	.dialog-extra-meta {
-		display: flex;
-		flex-direction: column;
-		gap: 0.3rem;
-		padding-bottom: 0.25rem;
-	}
-
-	.dialog-meta-row {
-		display: flex;
-		align-items: baseline;
-		gap: 0.5rem;
-		font-size: 0.72rem;
-		line-height: 1.5;
-
-		.dialog-section-label {
-			font-family: var(--font-heading);
-			font-size: 0.8rem;
-			min-width: 7rem;
-			flex-shrink: 0;
-		}
-
-		.dialog-meta-value {
-			font-size: 0.8rem;
-			text-align: right;
-			overflow-wrap: break-word;
-
-			a {
-				color: inherit;
-				text-decoration: underline;
-				text-underline-offset: 0.2rem;
-			}
-		}
-	}
-
-	.dialog-description {
-		font-size: 0.875rem;
-		line-height: 1.65;
-		opacity: 0.75;
-	}
-
-	.dialog-actions {
-		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-		padding-top: 0.25rem;
-	}
-
-	.dialog-source,
-	.dialog-arena-link {
-		flex: 1;
-		display: inline-block;
-
-		font-size: 0.9rem;
-		text-transform: uppercase;
-		text-decoration: none;
-		text-align: center;
-		background-color: var(--text);
-		color: var(--background);
-
-
-		padding: 0.6rem 1rem;
-		border-radius: 10rem;
-
-
-		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-
-		:hover {
-			background: var(--text);
-			color: var(--background);
-			border-color: var(--text);
-		}
-	}
-
-	.dialog-source[hidden] {
-		display: none;
-	}
-
-	.dialog-media {
-		flex: 0 0 auto;
-		overflow: hidden;
-		border-radius: 0 0 1.5rem 1.5rem;
-
-
-		:is(img, video, iframe) {
-			display: block;
-			width: 100%;
-			border: 0;
-		}
-
-		img,
-		video {
-			max-height: 60vh;
-		}
-
-		video {
-			object-fit: cover;
-		}
-
-		img {
-			object-fit: cover;
-			object-position: center;
-		}
-	}
-
-	.dialog-media {
-		height: 55vh;
-
-		:is(video, iframe) {
-			height: 100%;
-			max-height: none;
-		}
-	}
-
-
-	.pdf-open-link {
-		display: block;
-		text-align: center;
-		padding: 0.6rem;
-		font-size: 0.7rem;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		background: var(--background);
-		color: var(--text);
-		text-decoration: none;
-		border-top: 0.08rem solid color-mix(in srgb, var(--text) 15%, transparent);
-	}
+    /* The .hero blur does the work; the header stays visible. */
+    &::backdrop {
+        background: transparent;
+    }
 }
 
-
-
-
-
-/* ===================== BREAKPOINTS ===================== */
-
-@media (width > 768px) {
-	body {
-		font-size: 1.5rem;
-	}
-
-	.blocks {
-		padding: 2rem;
-
-		ul {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-
-	hgroup h1 {
-		font-size: 10rem;
-	}
-
-	footer {
-		margin-left: 2rem;
-		margin-right: 2rem;
-
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-	}
+/* Prev arrow · card · next arrow */
+.card-stage {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
 }
+
+.btn-step.pill-button {
+    padding: 1.25rem 0.6rem;
+}
+
+/* Two stacked faces; flipping rotates the whole card. */
+.flip-card {
+    display: grid;
+    height: var(--card-h);
+    aspect-ratio: 5 / 7;
+    transform: perspective(2000px) rotateY(0);
+    transform-style: preserve-3d;
+    transition:
+        transform 0.6s cubic-bezier(0.3, 0.7, 0.3, 1),
+        scale 0.3s ease,
+        opacity 0.3s ease;
+
+    /* Grow in when the card opens */
+    @starting-style {
+        scale: 0.6;
+        opacity: 0;
+    }
+}
+
+#dialog.is-flipped .flip-card {
+    transform: perspective(2000px) rotateY(180deg);
+}
+
+.card-face {
+    grid-area: 1 / 1;
+    min-height: 0;
+    border-radius: calc(var(--card-inner-radius) + var(--card-border-big)); /* back matches the front's outline */
+    overflow: hidden;
+    backface-visibility: hidden;
+    /* Iframes ignore backface-visibility, so hide the far face halfway through the flip. */
+    transition: visibility 0s 0.3s;
+}
+
+#dialog:not(.is-flipped) .card-back,
+#dialog.is-flipped .card-front {
+    visibility: hidden;
+}
+
+/* FRONT: the media, 5:7, filling and cropping */
+.card-front {
+    border: var(--card-border-big) solid var(--background);
+    background: var(--text);
+    color: var(--background);
+
+    /* Audio, or a PDF with no page image: a copy of the small card */
+    > li {
+        height: 100%;
+        list-style: none;
+    }
+
+    .embed-wrapper {
+        position: relative;
+
+        .media-fill:is(iframe, video) {
+            position: absolute;
+            inset: 0;
+            border: 0;
+        }
+    }
+}
+
+/* BACK: name, number, ingredients, source, Are.na link */
+.card-back {
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+    overflow-y: auto;
+    background: var(--about-bg);
+    color: var(--text);
+
+    h3 {
+        margin-bottom: 0.75rem;
+        font-family: var(--font-mono);
+        font-size: var(--text-base);
+        font-weight: 500;
+        letter-spacing: var(--tracking-caps);
+        text-transform: uppercase;
+    }
+}
+
+.card-back-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.card-name {
+    min-width: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: var(--leading-snug); /* room for descenders (g, y, p) — overflow: hidden would clip them at 1 */
+    /* one line, even on narrow phones */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-number {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    letter-spacing: var(--tracking-caps);
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    li {
+        padding: 0.2em 0.8em;
+        border: 0.08rem solid currentColor;
+        border-radius: 10rem;
+        font-size: var(--text-base);
+    }
+}
+
+.card-source-text {
+    font-size: var(--text-md);
+    line-height: var(--leading-body);
+    overflow-wrap: anywhere;
+
+    a {
+        text-decoration: underline;
+        text-underline-offset: 0.15em;
+    }
+}
+
+.card-arena-link {
+    margin-top: auto;
+    align-self: flex-end;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Phones: arrows tuck in closer, smaller type on the back */
+@media (width <= 768px) {
+    #dialog {
+        --card-h: min(62svh, 70vw * 7 / 5);
+        gap: 1.5rem;
+    }
+
+    .card-stage {
+        gap: 0.5rem;
+    }
+
+    .card-back {
+        gap: 1.25rem;
+        padding: 1.25rem;
+    }
+
+    .card-name {
+        font-size: var(--text-xl);
+    }
+}
+
+/* Breakpoints */
 
 @media (width > 1200px) {
-	body {
-		font-size: 1.5rem;
-		font-kerning: normal;
-	}
+    body {
+        font-kerning: normal;
+    }
 
-	hgroup h1 {
-		font-size: 18rem;
-	}
-
-	.text-block .text-content {
-		padding: 2.5rem;
-
-		p {
-			font-size: 1.2rem;
-			line-height: 2rem;
-		}
-	}
-}
-
-/* =
-	 ======================================================================= */
-
-/* --- NAV: show ONE system at a time --- */
-#navigation .filter-buttons {
-	display: flex;
-	justify-content: space-between;
-	gap: 2rem;
-}
-
-#navigation #filter-select {
-	display: none;
-	width: 100%;
-}
-
-/* Mobile: hide buttons, show custom dropdown */
-@media (max-width: 768px) {
-	#navigation .filter-buttons {
-		display: none !important;
-	}
-
-	#navigation #filter-select {
-		display: block !important;
-	}
-}
-
-/* Desktop: show buttons, hide custom dropdown */
-@media (min-width: 769px) {
-	#navigation .filter-buttons {
-		display: flex !important;
-	}
-
-	#navigation #filter-select {
-		display: none !important;
-	}
-}
-
-/* Custom dropdown: open state */
-#filter-options {
-	display: none;
-}
-
-#filter-select.is-open #filter-options {
-	display: block;
-}
-
-#filter-options li.is-selected {
-	background: var(--background);
-	color: var(--text);
+    .text-block .text-content {
+        padding: 2.5rem;
+    }
 }
