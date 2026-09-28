@@ -41,7 +41,16 @@
     --font-mono: "DM Mono", monospace;
 
     --about-bg: #ffffff;
-    --about-button: #d6d6d6;
+    /* Glass buttons: clear frosted glass on the black page, smoked glass on white surfaces */
+    --glass-fill: rgb(255 255 255 / 0.12);
+    --glass-fill-hover: rgb(255 255 255 / 0.24);
+    --glass-edge: rgb(255 255 255 / 0.28);
+    --glass-edge-hover: rgb(255 255 255 / 0.5);
+    --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.35); /* light catching the top rim */
+    --glass-blur: blur(12px) saturate(1.4);
+    --glass-dark-fill: rgb(18 18 18 / 0.06);
+    --glass-dark-fill-hover: rgb(18 18 18 / 0.12);
+    --glass-dark-edge: rgb(18 18 18 / 0.14);
 
     --padding-1: 1rem;
     --padding-2: 2rem;
@@ -103,20 +112,33 @@ header {
         padding: 0.3rem;
         border: none;
         border-radius: 0.4rem;
-        background: var(--about-button);
-        color: var(--text);
+        --g-fill: var(--glass-fill);
+        --g-edge: var(--glass-edge);
+        --g-text: var(--about-bg);
+        --g-drop: 0 0.5rem 1.5rem rgb(0 0 0 / 0.35);
+        background: var(--g-fill);
+        color: var(--g-text);
+        /* edge as an inset shadow (not a border) so no button changes size */
+        box-shadow:
+            inset 0 0 0 1px var(--g-edge),
+            var(--glass-highlight),
+            var(--g-drop);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
         cursor: pointer;
         outline: 0.1rem solid transparent;
         outline-offset: 0.2rem;
         transition:
             background 0.2s ease,
+            box-shadow 0.2s ease,
             outline-color 0.2s ease,
             scale 0.1s ease;
 
-        /* Same states as the pill buttons: grey, white + outline ring on hover/focus, pressed in on click */
+        /* Same states as the pill buttons: glass, brighter + outline ring on hover/focus, pressed in on click */
         &:hover,
         &:focus-visible {
-            background: var(--about-bg);
+            --g-fill: var(--glass-fill-hover);
+            --g-edge: var(--glass-edge-hover);
             outline-color: var(--about-bg);
         }
 
@@ -599,8 +621,19 @@ body:has(.about:popover-open) {
     min-width: 9.25rem;
     padding: 1rem 0.75rem;
     border-radius: 0.4rem;
-    background: var(--about-button);
-    color: var(--text);
+    --g-fill: var(--glass-fill);
+    --g-edge: var(--glass-edge);
+    --g-text: var(--about-bg);
+    --g-drop: 0 0.5rem 1.5rem rgb(0 0 0 / 0.35);
+    background: var(--g-fill);
+    color: var(--g-text);
+    /* edge as an inset shadow (not a border) so no button changes size */
+    box-shadow:
+        inset 0 0 0 1px var(--g-edge),
+        var(--glass-highlight),
+        var(--g-drop);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
     font-family: var(--font-mono);
     font-size: var(--text-base);
     letter-spacing: var(--tracking-caps);
@@ -611,6 +644,7 @@ body:has(.about:popover-open) {
     transition:
         background 0.2s ease,
         color 0.2s ease,
+        box-shadow 0.2s ease,
         outline-color 0.2s ease,
         scale 0.1s ease;
 
@@ -620,11 +654,18 @@ body:has(.about:popover-open) {
     }
 }
 
-/* Hover/focus on the white About popup and card back: fill dark, with a dark outline ring */
+/* On the white About popup and card back: smoked glass with dark text */
+.about-links a,
+.card-arena-link {
+    --g-fill: var(--glass-dark-fill);
+    --g-edge: var(--glass-dark-edge);
+    --g-text: var(--text);
+    --g-drop: 0 0.25rem 0.75rem rgb(0 0 0 / 0.08);
+}
+
 .about-links a:is(:hover, :focus-visible),
 .card-arena-link:is(:hover, :focus-visible) {
-    background: var(--text);
-    color: var(--about-bg);
+    --g-fill: var(--glass-dark-fill-hover);
     outline-color: var(--text);
 }
 
@@ -637,11 +678,11 @@ body:has(.about:popover-open) {
     border: none;
     cursor: pointer;
 
-    /* Hover/focus on the black page: fill white, with a white outline ring */
+    /* Hover/focus on the black page: brighter glass, with a white outline ring */
     &:hover,
     &:focus-visible {
-        background: var(--about-bg);
-        color: var(--text);
+        --g-fill: var(--glass-fill-hover);
+        --g-edge: var(--glass-edge-hover);
         outline-color: var(--about-bg);
     }
 }
@@ -895,5 +936,13 @@ body:has(.about:popover-open) .hero {
 
     .text-block .text-content {
         padding: 2.5rem;
+    }
+}
+
+/* No backdrop blur: make the glass more opaque so text stays legible */
+@supports not (backdrop-filter: blur(1px)) {
+    :root {
+        --glass-fill: rgb(255 255 255 / 0.22);
+        --glass-dark-fill: rgb(18 18 18 / 0.12);
     }
 }

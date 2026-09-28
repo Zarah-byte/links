@@ -5,7 +5,7 @@ const channelSlug = "glassware-rxfrlfenjcu";
 
 // Covers stand in for media in the fan; the real thing shows on the big card.
 const LINK_COVER = "assets/links-cover.svg";
-const AUDIO_COVER = "assets/audio-cover.png";
+const AUDIO_COVER = "assets/audio-cover.svg";
 const VIDEO_COVER = "assets/video-cover.svg"; // uploaded videos and YouTube/Vimeo embeds
 const TEXT_COVER = "assets/text.svg"; // text blocks and PDFs
 
