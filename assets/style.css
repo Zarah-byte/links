@@ -101,20 +101,27 @@ header {
         width: 2.625rem;
         aspect-ratio: 1;
         padding: 0.3rem;
-        border: 0.1rem solid var(--background);
-        border-radius: 0.2rem;
-        background: transparent;
-        color: var(--background);
+        border: none;
+        border-radius: 0.4rem;
+        background: var(--about-button);
+        color: var(--text);
         cursor: pointer;
+        outline: 0.1rem solid transparent;
+        outline-offset: 0.2rem;
         transition:
             background 0.2s ease,
-            color 0.2s ease;
+            outline-color 0.2s ease,
+            scale 0.1s ease;
 
-        /* Hover / keyboard focus: fill white, icon goes dark */
+        /* Same states as the pill buttons: grey, white + outline ring on hover/focus, pressed in on click */
         &:hover,
         &:focus-visible {
-            background: var(--background);
-            color: var(--text);
+            background: var(--about-bg);
+            outline-color: var(--about-bg);
+        }
+
+        &:active {
+            scale: 0.96;
         }
 
         svg {
@@ -599,15 +606,26 @@ body:has(.about:popover-open) {
     letter-spacing: var(--tracking-caps);
     text-transform: uppercase;
     text-decoration: none;
+    outline: 0.1rem solid transparent;
+    outline-offset: 0.2rem;
     transition:
         background 0.2s ease,
-        color 0.2s ease;
+        color 0.2s ease,
+        outline-color 0.2s ease,
+        scale 0.1s ease;
 
-    &:hover,
-    &:focus-visible {
-        background: var(--text);
-        color: var(--about-bg);
+    /* Pressed: every button presses in slightly */
+    &:active {
+        scale: 0.96;
     }
+}
+
+/* Hover/focus on the white About popup and card back: fill dark, with a dark outline ring */
+.about-links a:is(:hover, :focus-visible),
+.card-arena-link:is(:hover, :focus-visible) {
+    background: var(--text);
+    color: var(--about-bg);
+    outline-color: var(--text);
 }
 
 /* Pill buttons sit on the black page, so they go white on hover. */
@@ -619,11 +637,12 @@ body:has(.about:popover-open) {
     border: none;
     cursor: pointer;
 
-    /* Dark-on-hover would vanish on the black page, so go white instead */
+    /* Hover/focus on the black page: fill white, with a white outline ring */
     &:hover,
     &:focus-visible {
         background: var(--about-bg);
         color: var(--text);
+        outline-color: var(--about-bg);
     }
 }
 
@@ -799,7 +818,7 @@ body:has(.about:popover-open) .hero {
     font-size: var(--text-2xl);
     font-weight: 700;
     line-height: var(--leading-snug); /* room for descenders (g, y, p) — overflow: hidden would clip them at 1 */
-    /* one line, even on narrow phones */
+    /* one line; cut with … only when the name is wider than the card */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

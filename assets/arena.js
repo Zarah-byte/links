@@ -170,9 +170,6 @@ function buildModalMedia(blockData) {
 // Hashtags in a block's description (#coupe #gin) are its ingredients.
 const TAG_PATTERN = /#[\p{L}\p{N}_-]+/gu;
 
-// Names longer than this are cut off with … on the back of the card.
-const NAME_MAX = 14;
-
 // Media type for the first ingredient pill; attachments are named by file type.
 function blockTypeLabel(blockData) {
 	const ct = blockData.attachment?.content_type || "";
@@ -241,7 +238,7 @@ function openModal(blockData, cardEl) {
 
 	// Back: name (full name on hover) and the order it was added to the board.
 	const name = blockData.title || "Untitled";
-	cardName.textContent = name.length > NAME_MAX ? name.slice(0, NAME_MAX).trimEnd() + "…" : name;
+	cardName.textContent = name; // CSS cuts it with … only if it doesn't fit on one line
 	cardName.title = name;
 	cardNumber.textContent = blockData.addedNumber ? `#${blockData.addedNumber}` : "";
 
