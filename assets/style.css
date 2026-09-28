@@ -42,14 +42,14 @@
 
     --about-bg: #ffffff;
     /* Glass buttons: clear frosted glass on the black page, smoked glass on white surfaces */
-    --glass-fill: rgb(255 255 255 / 0.12);
-    --glass-fill-hover: rgb(255 255 255 / 0.24);
-    --glass-edge: rgb(255 255 255 / 0.28);
-    --glass-edge-hover: rgb(255 255 255 / 0.5);
+    --glass-fill: rgb(255 255 255 / 0.22);
+    --glass-fill-hover: rgb(255 255 255 / 0.34);
+    --glass-edge: rgb(255 255 255 / 0.36);
+    --glass-edge-hover: rgb(255 255 255 / 0.55);
     --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.35); /* light catching the top rim */
-    --glass-blur: blur(12px) saturate(1.4);
-    --glass-dark-fill: rgb(18 18 18 / 0.06);
-    --glass-dark-fill-hover: rgb(18 18 18 / 0.12);
+    --glass-blur: blur(20px) saturate(1.3);
+    --glass-dark-fill: rgb(18 18 18 / 0.1);
+    --glass-dark-fill-hover: rgb(18 18 18 / 0.16);
     --glass-dark-edge: rgb(18 18 18 / 0.14);
 
     --padding-1: 1rem;
@@ -942,7 +942,7 @@ body:has(.about:popover-open) .hero {
 /* No backdrop blur: make the glass more opaque so text stays legible */
 @supports not (backdrop-filter: blur(1px)) {
     :root {
-        --glass-fill: rgb(255 255 255 / 0.22);
-        --glass-dark-fill: rgb(18 18 18 / 0.12);
+        --glass-fill: rgb(255 255 255 / 0.3);
+        --glass-dark-fill: rgb(18 18 18 / 0.16);
     }
 }
